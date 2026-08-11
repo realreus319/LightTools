@@ -253,7 +253,9 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
           />
         </label>
         {outputFormat === 'image/png' ? (
-          <p className="text-xs text-muted-foreground sm:col-span-2 lg:col-span-4">{copy.pngQualityNote}</p>
+          <p className="text-xs text-muted-foreground sm:col-span-2 lg:col-span-4">
+            {copy.pngQualityNote}
+          </p>
         ) : null}
       </section>
 
@@ -323,7 +325,8 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
                       </p>
                       {itemStats?.targetReached !== undefined ? (
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {itemStats.targetReached ? copy.targetReached : copy.targetClosest} · {copy.attempts}: {itemStats.attempts}
+                          {itemStats.targetReached ? copy.targetReached : copy.targetClosest} ·{' '}
+                          {copy.attempts}: {itemStats.attempts}
                         </p>
                       ) : null}
                     </div>

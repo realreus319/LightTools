@@ -21,8 +21,10 @@ export async function findHighestQualityAtTarget<T>({
   maxAttempts: number
   encode(quality: number): Promise<{ value: T; bytes: number }>
 }): Promise<QualitySearchResult<T>> {
-  if (!Number.isFinite(targetBytes) || targetBytes < 1) throw new RangeError('targetBytes must be positive')
-  if (!Number.isInteger(maxAttempts) || maxAttempts < 1) throw new RangeError('maxAttempts must be positive')
+  if (!Number.isFinite(targetBytes) || targetBytes < 1)
+    throw new RangeError('targetBytes must be positive')
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1)
+    throw new RangeError('maxAttempts must be positive')
 
   let low = 1
   let high = Math.max(1, Math.min(100, Math.round(maxQuality)))
@@ -49,7 +51,12 @@ export async function findHighestQualityAtTarget<T>({
 }
 
 export function calculateTargetResizeScale(targetBytes: number, currentBytes: number): number {
-  if (!Number.isFinite(targetBytes) || !Number.isFinite(currentBytes) || targetBytes <= 0 || currentBytes <= 0) {
+  if (
+    !Number.isFinite(targetBytes) ||
+    !Number.isFinite(currentBytes) ||
+    targetBytes <= 0 ||
+    currentBytes <= 0
+  ) {
     throw new RangeError('Target and current byte sizes must be positive')
   }
   if (currentBytes <= targetBytes) return 1
