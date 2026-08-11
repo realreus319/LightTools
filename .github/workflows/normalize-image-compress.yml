@@ -1,0 +1,39 @@
+name: Normalize image compression checkpoint
+
+on:
+  push:
+    branches: [feat/commercial-v1]
+    paths:
+      - '.github/workflows/normalize-image-compress.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/commercial-v1
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.11.1
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format
+      - name: Commit formatted checkpoint
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --all
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'chore: format image compression checkpoint'
+          git push origin HEAD:feat/commercial-v1
