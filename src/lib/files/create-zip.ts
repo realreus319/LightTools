@@ -23,6 +23,12 @@ async function pipeBlobToZipFile(blob: Blob, target: ZipPassThrough, signal?: Ab
   }
 }
 
+function copyToArrayBuffer(data: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(data.byteLength)
+  copy.set(data)
+  return copy.buffer
+}
+
 export async function createZipBlob(
   entries: readonly ZipEntry[],
   signal?: AbortSignal,
@@ -34,7 +40,7 @@ export async function createZipBlob(
   const names = createUniqueArchiveNames(entries.map((entry) => entry.name))
 
   return new Promise<Blob>((resolve, reject) => {
-    const chunks: Uint8Array[] = []
+    const chunks: ArrayBuffer[] = []
     let settled = false
     const zip = new Zip((error, data, final) => {
       if (settled) return
@@ -45,7 +51,7 @@ export async function createZipBlob(
         )
         return
       }
-      chunks.push(data)
+      chunks.push(copyToArrayBuffer(data))
       if (final) {
         settled = true
         resolve(new Blob(chunks, { type: 'application/zip' }))
