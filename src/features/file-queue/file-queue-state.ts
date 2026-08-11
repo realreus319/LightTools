@@ -16,8 +16,10 @@ export type FileQueueItem = {
   error?: ToolError
 }
 
+export type NewFileQueueItem = Pick<FileQueueItem, 'id' | 'file'>
+
 export type FileQueueAction =
-  | { type: 'add'; files: readonly File[] }
+  | { type: 'add'; items: readonly NewFileQueueItem[] }
   | { type: 'start'; id: string }
   | { type: 'progress'; id: string; progress: number }
   | { type: 'success'; id: string; result: FileQueueResult }
@@ -26,6 +28,10 @@ export type FileQueueAction =
   | { type: 'retry'; id: string }
   | { type: 'remove'; id: string }
   | { type: 'clear' }
+
+export function createFileQueueItems(files: readonly File[]): NewFileQueueItem[] {
+  return files.map((file) => ({ id: crypto.randomUUID(), file }))
+}
 
 function updateItem(
   items: readonly FileQueueItem[],
@@ -43,9 +49,8 @@ export function fileQueueReducer(
     case 'add':
       return [
         ...items,
-        ...action.files.map((file) => ({
-          id: crypto.randomUUID(),
-          file,
+        ...action.items.map((item) => ({
+          ...item,
           status: 'queued' as const,
           progress: 0,
         })),

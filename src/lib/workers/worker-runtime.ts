@@ -1,7 +1,7 @@
 import { isToolError, ToolError, toToolError } from '@/lib/errors/tool-error'
 import type { WorkerHandlers, WorkerRequest, WorkerResponse } from './protocol'
 
-type WorkerScope = {
+export type WorkerRuntimeScope = {
   addEventListener(type: 'message', listener: (event: MessageEvent<WorkerRequest>) => void): void
   postMessage(message: WorkerResponse, transfer?: Transferable[]): void
 }
@@ -14,7 +14,7 @@ function isWorkerRequest(value: unknown): value is WorkerRequest {
   return record.type === 'run' && typeof record.task === 'string' && 'payload' in record
 }
 
-export function installWorkerRuntime(scope: WorkerScope, handlers: WorkerHandlers): void {
+export function installWorkerRuntime(scope: WorkerRuntimeScope, handlers: WorkerHandlers): void {
   const cancelled = new Set<string>()
 
   scope.addEventListener('message', (event) => {
@@ -63,10 +63,7 @@ export function installWorkerRuntime(scope: WorkerScope, handlers: WorkerHandler
         }
         const output = await handler(request.payload, context)
         context.throwIfCancelled()
-        scope.postMessage(
-          { type: 'success', id: request.id, result: output.result },
-          output.transfer,
-        )
+        scope.postMessage({ type: 'success', id: request.id, result: output.result }, output.transfer)
       } catch (error) {
         const toolError = isToolError(error) ? error : toToolError(error)
         scope.postMessage({

@@ -15,7 +15,7 @@ const RAW_TOOLS = [
     localOnly: true,
     featured: true,
     related: ['image-convert', 'image-resize', 'image-metadata-remove'],
-    status: 'planned',
+    status: 'beta',
   },
   {
     slug: 'image-convert',
