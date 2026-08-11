@@ -132,8 +132,7 @@ pdf/parse-page-ranges.ts
 
 ```ts
 type WorkerRequest =
-  | { type: 'compress-image'; id: string; payload: CompressPayload }
-  | { type: 'cancel'; id: string }
+  { type: 'compress-image'; id: string; payload: CompressPayload } | { type: 'cancel'; id: string }
 ```
 
 - 大 ArrayBuffer 使用 transferables，避免复制。

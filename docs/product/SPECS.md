@@ -501,11 +501,7 @@ v1.1 可加入 PWA，但架构预留：
 
 ```ts
 type Entitlement =
-  | 'batch-large'
-  | 'advanced-presets'
-  | 'no-ads'
-  | 'saved-presets'
-  | 'priority-codec'
+  'batch-large' | 'advanced-presets' | 'no-ads' | 'saved-presets' | 'priority-codec'
 ```
 
 UI 只读取 entitlement，不直接依赖支付供应商。
