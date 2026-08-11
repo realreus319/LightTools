@@ -7,16 +7,27 @@ function normalizeQuality(quality: number): number {
   return Math.max(1, Math.min(100, Math.round(quality)))
 }
 
-function requireEightBitImageData(value: {
-  data: Uint8ClampedArray | Uint16Array
-  width: number
-  height: number
-}): ImageData {
+function requireEightBitImageData(
+  value:
+    | {
+        data: Uint8ClampedArray | Uint16Array
+        width: number
+        height: number
+      }
+    | null,
+): ImageData {
+  if (!value) {
+    throw new ToolError('DECODE_FAILED', 'Image decoder returned no pixels', { stage: 'decode' })
+  }
   if (!(value.data instanceof Uint8ClampedArray)) {
     throw new ToolError('DECODE_FAILED', 'Only 8-bit image data is supported', { stage: 'decode' })
   }
-  if (value instanceof ImageData) return value
-  return new ImageData(value.data, value.width, value.height)
+  if (value instanceof ImageData && value.data.buffer instanceof ArrayBuffer) return value
+
+  // TypeScript 6 会保留 SharedArrayBuffer 的可能性；复制像素以确保 ImageData 独占普通 ArrayBuffer。
+  const pixels = new Uint8ClampedArray(value.data.length)
+  pixels.set(value.data)
+  return new ImageData(pixels, value.width, value.height)
 }
 
 async function decodeImage(buffer: ArrayBuffer, mime: SupportedImageMime): Promise<ImageData> {
