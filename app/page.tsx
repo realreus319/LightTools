@@ -79,10 +79,16 @@ export default function HomePage() {
                 图片、PDF、文本和开发者工具，打开就能用。能在浏览器本地完成的任务，就不把你的文件交给服务器。
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a href="#image-tools" className={buttonVariants({ variant: 'primary', size: 'lg' })}>
+                <a
+                  href="#image-tools"
+                  className={buttonVariants({ variant: 'primary', size: 'lg' })}
+                >
                   浏览工具
                 </a>
-                <a href="#privacy-first" className={buttonVariants({ variant: 'outline', size: 'lg' })}>
+                <a
+                  href="#privacy-first"
+                  className={buttonVariants({ variant: 'outline', size: 'lg' })}
+                >
                   为什么更私密
                 </a>
               </div>
@@ -91,31 +97,48 @@ export default function HomePage() {
         </section>
 
         <Container className="py-6 sm:py-10">
-          <CategorySection id="image-tools" title="图片工具" description="图片编码和处理将由浏览器本地 Worker 执行。">
+          <CategorySection
+            id="image-tools"
+            title="图片工具"
+            description="图片编码和处理将由浏览器本地 Worker 执行。"
+          >
             {IMAGE_TOOLS.map((tool) => (
               <ToolCard key={tool.href} {...tool} category="Image" disabled />
             ))}
           </CategorySection>
 
-          <CategorySection id="pdf-tools" title="PDF 工具" description="无需把合同、资料或扫描件上传给第三方服务器。">
+          <CategorySection
+            id="pdf-tools"
+            title="PDF 工具"
+            description="无需把合同、资料或扫描件上传给第三方服务器。"
+          >
             {PDF_TOOLS.map((tool) => (
               <ToolCard key={tool.href} {...tool} category="PDF" disabled />
             ))}
           </CategorySection>
 
-          <CategorySection id="developer-tools" title="文本与开发者工具" description="高频小工具保持快速、可复制、可预测。">
+          <CategorySection
+            id="developer-tools"
+            title="文本与开发者工具"
+            description="高频小工具保持快速、可复制、可预测。"
+          >
             {DEVELOPER_TOOLS.map((tool) => (
               <ToolCard key={tool.href} {...tool} category="Developer" disabled />
             ))}
           </CategorySection>
         </Container>
 
-        <section id="privacy-first" className="border-t border-border/60 bg-background-muted/40 py-14 sm:py-20">
+        <section
+          id="privacy-first"
+          className="border-t border-border/60 bg-background-muted/40 py-14 sm:py-20"
+        >
           <Container>
             <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-start">
               <div>
                 <p className="text-sm font-semibold text-[var(--lt-brand)]">Local First</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">隐私不是一句标语，而是数据链路。</h2>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+                  隐私不是一句标语，而是数据链路。
+                </h2>
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 {[

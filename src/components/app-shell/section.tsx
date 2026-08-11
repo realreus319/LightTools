@@ -15,11 +15,15 @@ export function Section({ id, eyebrow, title, description, children }: SectionPr
       <Container>
         <div className="mb-7 max-w-3xl">
           {eyebrow ? (
-            <p className="mb-2 text-sm font-semibold tracking-wide text-[var(--lt-brand)]">{eyebrow}</p>
+            <p className="mb-2 text-sm font-semibold tracking-wide text-[var(--lt-brand)]">
+              {eyebrow}
+            </p>
           ) : null}
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
           {description ? (
-            <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">{description}</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
+              {description}
+            </p>
           ) : null}
         </div>
         {children}

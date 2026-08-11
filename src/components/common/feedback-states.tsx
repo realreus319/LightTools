@@ -33,7 +33,11 @@ export function ErrorState({
 
 export function LoadingState({ label = '正在处理' }: { label?: string }) {
   return (
-    <div role="status" aria-live="polite" className="flex items-center gap-3 text-sm text-muted-foreground">
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex items-center gap-3 text-sm text-muted-foreground"
+    >
       <span className="size-4 animate-spin rounded-full border-2 border-border border-t-[var(--lt-brand)] motion-reduce:animate-none" />
       <span>{label}</span>
     </div>
@@ -42,7 +46,10 @@ export function LoadingState({ label = '正在处理' }: { label?: string }) {
 
 export function ToolCardSkeleton() {
   return (
-    <div aria-hidden="true" className="min-h-52 animate-pulse rounded-2xl border border-border p-5 motion-reduce:animate-none">
+    <div
+      aria-hidden="true"
+      className="min-h-52 animate-pulse rounded-2xl border border-border p-5 motion-reduce:animate-none"
+    >
       <div className="h-3 w-20 rounded bg-background-muted" />
       <div className="mt-7 h-5 w-32 rounded bg-background-muted" />
       <div className="mt-3 h-3 w-full rounded bg-background-muted" />
