@@ -1,14 +1,14 @@
 # Third-Party Notices
 
-LightTools tracks third-party dependencies before commercial release. The lockfile is the source of truth for installed versions.
+LightTools tracks third-party dependencies before commercial release. The committed lockfile is the source of truth for installed transitive versions.
 
-| Package | Purpose | License status |
-| --- | --- | --- |
-| Next.js | Web application framework | MIT; verify installed version notice at release |
-| React / React DOM | UI runtime | MIT; verify installed version notice at release |
-| Tailwind CSS | Styling | MIT; verify installed version notice at release |
-| Appica UI (`@appica/ui-react`) | UI component system | **Pending registry/package license verification before any paid release** |
-| Vitest | Unit/integration tests | MIT; verify installed version notice at release |
+| Package | Version | Purpose | License status |
+| --- | --- | --- | --- |
+| Next.js | 16.2.12 | Web application framework | MIT; retain applicable notices |
+| React / React DOM | 19.2.8 | UI runtime | MIT; retain applicable notices |
+| Tailwind CSS | 4.3.3 | Styling | MIT; retain applicable notices |
+| Appica UI (`@appica/ui-react`) | 1.0.0 | UI component system | MIT; npm registry metadata verified in CI |
+| Vitest | 4.1.10 | Unit/integration tests | MIT; development dependency |
 
 ## Release rule
 
