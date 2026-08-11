@@ -48,7 +48,10 @@ export function FileQueueList({ items, locale, labels, onRetry, onRemove }: File
             </div>
           </div>
           {item.status === 'processing' ? (
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-background-muted" aria-hidden="true">
+            <div
+              className="mt-3 h-1.5 overflow-hidden rounded-full bg-background-muted"
+              aria-hidden="true"
+            >
               <div
                 className="h-full rounded-full bg-[var(--lt-brand)] transition-[width] motion-reduce:transition-none"
                 style={{ width: `${Math.round(item.progress * 100)}%` }}

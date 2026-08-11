@@ -30,7 +30,11 @@ export function installWorkerRuntime(scope: WorkerScope, handlers: WorkerHandler
       scope.postMessage({
         type: 'error',
         id: request.id,
-        error: { code: 'UNKNOWN_ERROR', message: `Unknown worker task: ${request.task}`, stage: 'worker' },
+        error: {
+          code: 'UNKNOWN_ERROR',
+          message: `Unknown worker task: ${request.task}`,
+          stage: 'worker',
+        },
       })
       return
     }
@@ -59,7 +63,10 @@ export function installWorkerRuntime(scope: WorkerScope, handlers: WorkerHandler
         }
         const output = await handler(request.payload, context)
         context.throwIfCancelled()
-        scope.postMessage({ type: 'success', id: request.id, result: output.result }, output.transfer)
+        scope.postMessage(
+          { type: 'success', id: request.id, result: output.result },
+          output.transfer,
+        )
       } catch (error) {
         const toolError = isToolError(error) ? error : toToolError(error)
         scope.postMessage({

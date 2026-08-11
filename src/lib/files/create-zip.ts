@@ -11,7 +11,8 @@ async function pipeBlobToZipFile(blob: Blob, target: ZipPassThrough, signal?: Ab
   const reader = blob.stream().getReader()
   try {
     while (true) {
-      if (signal?.aborted) throw new ToolError('TASK_CANCELLED', 'Archive cancelled', { stage: 'archive' })
+      if (signal?.aborted)
+        throw new ToolError('TASK_CANCELLED', 'Archive cancelled', { stage: 'archive' })
       const { done, value } = await reader.read()
       if (done) break
       target.push(value, false)
@@ -22,7 +23,10 @@ async function pipeBlobToZipFile(blob: Blob, target: ZipPassThrough, signal?: Ab
   }
 }
 
-export async function createZipBlob(entries: readonly ZipEntry[], signal?: AbortSignal): Promise<Blob> {
+export async function createZipBlob(
+  entries: readonly ZipEntry[],
+  signal?: AbortSignal,
+): Promise<Blob> {
   if (signal?.aborted) {
     throw new ToolError('TASK_CANCELLED', 'Archive cancelled', { stage: 'archive' })
   }
@@ -36,7 +40,9 @@ export async function createZipBlob(entries: readonly ZipEntry[], signal?: Abort
       if (settled) return
       if (error) {
         settled = true
-        reject(new ToolError('ZIP_FAILED', 'ZIP creation failed', { stage: 'archive', cause: error }))
+        reject(
+          new ToolError('ZIP_FAILED', 'ZIP creation failed', { stage: 'archive', cause: error }),
+        )
         return
       }
       chunks.push(data)
@@ -63,7 +69,10 @@ export async function createZipBlob(entries: readonly ZipEntry[], signal?: Abort
         reject(
           error instanceof ToolError
             ? error
-            : new ToolError('ZIP_FAILED', 'ZIP creation failed', { stage: 'archive', cause: error }),
+            : new ToolError('ZIP_FAILED', 'ZIP creation failed', {
+                stage: 'archive',
+                cause: error,
+              }),
         )
       }
     })()

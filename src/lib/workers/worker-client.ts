@@ -25,10 +25,14 @@ export class WorkerClient {
 
   run<TResult>(task: string, payload: unknown, options: WorkerRunOptions = {}): Promise<TResult> {
     if (this.disposed) {
-      return Promise.reject(new ToolError('WORKER_CRASHED', 'Worker client is disposed', { stage: 'worker' }))
+      return Promise.reject(
+        new ToolError('WORKER_CRASHED', 'Worker client is disposed', { stage: 'worker' }),
+      )
     }
     if (options.signal?.aborted) {
-      return Promise.reject(new ToolError('TASK_CANCELLED', 'Task cancelled before start', { stage: 'worker' }))
+      return Promise.reject(
+        new ToolError('TASK_CANCELLED', 'Task cancelled before start', { stage: 'worker' }),
+      )
     }
 
     const id = crypto.randomUUID()
@@ -42,7 +46,8 @@ export class WorkerClient {
       if (options.signal) {
         const handleAbort = () => this.cancel(id)
         options.signal.addEventListener('abort', handleAbort, { once: true })
-        pending.removeAbortListener = () => options.signal?.removeEventListener('abort', handleAbort)
+        pending.removeAbortListener = () =>
+          options.signal?.removeEventListener('abort', handleAbort)
       }
 
       this.pending.set(id, pending)

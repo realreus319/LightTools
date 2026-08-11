@@ -68,7 +68,9 @@ export function FileDropzone({
         }}
       />
       <h2 className="text-lg font-semibold">{isDragging ? labels.dropActive : labels.title}</h2>
-      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">{labels.description}</p>
+      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+        {labels.description}
+      </p>
       <Button
         type="button"
         className="mt-5"

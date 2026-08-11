@@ -17,13 +17,7 @@ export type ToolErrorCode =
   | 'UNKNOWN_ERROR'
 
 export type ToolStage =
-  | 'validation'
-  | 'decode'
-  | 'transform'
-  | 'encode'
-  | 'archive'
-  | 'worker'
-  | 'download'
+  'validation' | 'decode' | 'transform' | 'encode' | 'archive' | 'worker' | 'download'
 
 export class ToolError extends Error {
   readonly code: ToolErrorCode
@@ -45,7 +39,10 @@ export function isToolError(error: unknown): error is ToolError {
   return error instanceof ToolError
 }
 
-export function toToolError(error: unknown, fallbackCode: ToolErrorCode = 'UNKNOWN_ERROR'): ToolError {
+export function toToolError(
+  error: unknown,
+  fallbackCode: ToolErrorCode = 'UNKNOWN_ERROR',
+): ToolError {
   if (isToolError(error)) return error
   if (error instanceof Error) {
     return new ToolError(fallbackCode, error.message, { cause: error })

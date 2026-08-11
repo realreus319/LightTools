@@ -25,7 +25,10 @@ export const PDF_FILE_POLICY: FilePolicy = Object.freeze({
   acceptedMimeTypes: ['application/pdf'],
 })
 
-export function matchesAcceptedMime(mimeType: string, acceptedMimeTypes: readonly string[]): boolean {
+export function matchesAcceptedMime(
+  mimeType: string,
+  acceptedMimeTypes: readonly string[],
+): boolean {
   return acceptedMimeTypes.some((accepted) => {
     if (accepted.endsWith('/*')) {
       return mimeType.startsWith(`${accepted.slice(0, -1)}`)

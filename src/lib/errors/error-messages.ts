@@ -30,7 +30,8 @@ const MESSAGES: Record<Locale, Record<ToolErrorCode, string>> = {
     IMAGE_TOO_LARGE: 'The image dimensions are too large and may exhaust browser memory.',
     DECODE_FAILED: 'The file could not be decoded. It may be damaged or unsupported.',
     ENCODE_FAILED: 'The output could not be generated. Adjust the settings and try again.',
-    TARGET_SIZE_UNREACHABLE: 'The target size cannot be reached within the available quality and dimension range.',
+    TARGET_SIZE_UNREACHABLE:
+      'The target size cannot be reached within the available quality and dimension range.',
     PDF_ENCRYPTED: 'This PDF is password or permission protected and cannot be processed.',
     PDF_INVALID: 'The PDF could not be read and may be damaged.',
     WORKER_CRASHED: 'The local processing worker stopped unexpectedly. Please retry.',

@@ -19,7 +19,11 @@ export class ConcurrencyPool {
       const entry: QueueEntry = {
         run: async () => {
           if (signal?.aborted) {
-            reject(new ToolError('TASK_CANCELLED', 'Task cancelled before execution', { stage: 'worker' }))
+            reject(
+              new ToolError('TASK_CANCELLED', 'Task cancelled before execution', {
+                stage: 'worker',
+              }),
+            )
             return
           }
           try {
