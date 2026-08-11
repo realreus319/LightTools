@@ -53,7 +53,7 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
   const [maxDimension, setMaxDimension] = useState('')
   const [batchError, setBatchError] = useState<string>()
   const [stats, setStats] = useState<Record<string, ImageStats>>({})
-  const poolRef = useRef<WorkerClientPool>()
+  const poolRef = useRef<WorkerClientPool | undefined>(undefined)
   const controllersRef = useRef(new Map<string, AbortController>())
 
   const getPool = useCallback(() => {
@@ -275,7 +275,8 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
           </div>
           <div className="grid gap-3">
             {successItems.map((item) => {
-              if (!item.result) return null
+              const result = item.result
+              if (!result) return null
               const itemStats = stats[item.id]
               const savings = itemStats
                 ? Math.round((1 - itemStats.outputBytes / item.file.size) * 100)
@@ -287,18 +288,18 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
                 >
                   <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
                     <div className="min-w-0">
-                      <p className="truncate font-medium" title={item.result.fileName}>
-                        {item.result.fileName}
+                      <p className="truncate font-medium" title={result.fileName}>
+                        {result.fileName}
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground">
                         {copy.originalSize}: {formatFileSize(item.file.size, locale)} ·{' '}
-                        {copy.resultSize}: {formatFileSize(item.result.blob.size, locale)}
+                        {copy.resultSize}: {formatFileSize(result.blob.size, locale)}
                         {itemStats
                           ? ` · ${copy.saved}: ${savings}% · ${copy.dimensions}: ${itemStats.width}×${itemStats.height}`
                           : ''}
                       </p>
                     </div>
-                    <Button onClick={() => downloadBlob(item.result!.blob, item.result!.fileName)}>
+                    <Button onClick={() => downloadBlob(result.blob, result.fileName)}>
                       {copy.download}
                     </Button>
                   </div>
