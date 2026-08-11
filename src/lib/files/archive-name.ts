@@ -1,6 +1,6 @@
 export function sanitizeArchiveName(name: string, fallback: string): string {
-  const baseName = name
-    .replace(/[\\/]+/g, '-')
+  const leafName = name.replace(/\\/g, '/').split('/').filter(Boolean).at(-1) ?? ''
+  const baseName = leafName
     .replace(/[\u0000-\u001f\u007f]+/g, '')
     .replace(/^\.+/, '')
     .trim()
