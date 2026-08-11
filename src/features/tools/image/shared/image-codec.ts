@@ -8,13 +8,11 @@ function normalizeQuality(quality: number): number {
 }
 
 function requireEightBitImageData(
-  value:
-    | {
-        data: Uint8ClampedArray | Uint16Array
-        width: number
-        height: number
-      }
-    | null,
+  value: {
+    data: Uint8ClampedArray | Uint16Array
+    width: number
+    height: number
+  } | null,
 ): ImageData {
   if (!value) {
     throw new ToolError('DECODE_FAILED', 'Image decoder returned no pixels', { stage: 'decode' })
