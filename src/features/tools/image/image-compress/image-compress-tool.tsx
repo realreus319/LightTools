@@ -36,6 +36,9 @@ type ImageStats = {
   width: number
   height: number
   mime: SupportedImageMime
+  quality: number
+  attempts: number
+  targetReached?: boolean
 }
 
 function createPool(): WorkerClientPool {
@@ -51,6 +54,7 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
   const [quality, setQuality] = useState(80)
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('same')
   const [maxDimension, setMaxDimension] = useState('')
+  const [targetSizeKb, setTargetSizeKb] = useState('')
   const [batchError, setBatchError] = useState<string>()
   const [stats, setStats] = useState<Record<string, ImageStats>>({})
   const poolRef = useRef<WorkerClientPool | undefined>(undefined)
@@ -76,6 +80,7 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
         const inputMime = validation.mimeType
         const outputMime = outputFormat === 'same' ? inputMime : outputFormat
         const dimensionLimit = Number.parseInt(maxDimension, 10)
+        const targetKilobytes = Number.parseFloat(targetSizeKb)
         const buffer = await item.file.arrayBuffer()
         const payload: ImageProcessPayload = {
           buffer,
@@ -84,6 +89,9 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
           quality,
           ...(Number.isFinite(dimensionLimit) && dimensionLimit > 0
             ? { maxWidth: dimensionLimit, maxHeight: dimensionLimit }
+            : {}),
+          ...(Number.isFinite(targetKilobytes) && targetKilobytes > 0
+            ? { targetBytes: Math.round(targetKilobytes * 1024) }
             : {}),
         }
         const result = await getPool().run<ImageProcessResult>('process-image', payload, {
@@ -101,6 +109,9 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
             width: result.width,
             height: result.height,
             mime: result.mime,
+            quality: result.quality,
+            attempts: result.attempts,
+            targetReached: result.targetReached,
           },
         }))
       } catch (error) {
@@ -114,7 +125,7 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
         controllersRef.current.delete(item.id)
       }
     },
-    [dispatch, getPool, maxDimension, outputFormat, quality],
+    [dispatch, getPool, maxDimension, outputFormat, quality, targetSizeKb],
   )
 
   useEffect(() => {
@@ -190,7 +201,7 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 rounded-3xl border border-border bg-background p-5 sm:grid-cols-3 sm:p-6">
+      <section className="grid gap-4 rounded-3xl border border-border bg-background p-5 sm:grid-cols-2 lg:grid-cols-4 sm:p-6">
         <label className="grid gap-2 text-sm font-medium">
           <span>
             {copy.quality}: {quality}
@@ -229,8 +240,20 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
             onChange={(event) => setMaxDimension(event.currentTarget.value)}
           />
         </label>
+        <label className="grid gap-2 text-sm font-medium">
+          <span>{copy.targetSize}</span>
+          <Input
+            type="number"
+            min="1"
+            step="1"
+            inputMode="decimal"
+            placeholder="100"
+            value={targetSizeKb}
+            onChange={(event) => setTargetSizeKb(event.currentTarget.value)}
+          />
+        </label>
         {outputFormat === 'image/png' ? (
-          <p className="text-xs text-muted-foreground sm:col-span-3">{copy.pngQualityNote}</p>
+          <p className="text-xs text-muted-foreground sm:col-span-2 lg:col-span-4">{copy.pngQualityNote}</p>
         ) : null}
       </section>
 
@@ -295,9 +318,14 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
                         {copy.originalSize}: {formatFileSize(item.file.size, locale)} ·{' '}
                         {copy.resultSize}: {formatFileSize(result.blob.size, locale)}
                         {itemStats
-                          ? ` · ${copy.saved}: ${savings}% · ${copy.dimensions}: ${itemStats.width}×${itemStats.height}`
+                          ? ` · ${copy.saved}: ${savings}% · ${copy.dimensions}: ${itemStats.width}×${itemStats.height} · ${copy.finalQuality}: ${itemStats.quality}`
                           : ''}
                       </p>
+                      {itemStats?.targetReached !== undefined ? (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {itemStats.targetReached ? copy.targetReached : copy.targetClosest} · {copy.attempts}: {itemStats.attempts}
+                        </p>
+                      ) : null}
                     </div>
                     <Button onClick={() => downloadBlob(result.blob, result.fileName)}>
                       {copy.download}
