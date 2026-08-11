@@ -1,0 +1,319 @@
+import type { ToolCategory, ToolDefinition } from './schema'
+import { ToolRegistrySchema } from './schema'
+
+const RAW_TOOLS = [
+  {
+    slug: 'image-compress',
+    category: 'image',
+    titleKey: 'tools.image-compress.title',
+    descriptionKey: 'tools.image-compress.description',
+    keywords: ['compress', 'image', 'jpeg', 'jpg', 'png', 'webp', 'avif', '压缩', '图片'],
+    aliases: ['compress image', '图片压缩', '照片压缩'],
+    icon: 'image-compress',
+    inputKinds: ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
+    outputKinds: ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
+    localOnly: true,
+    featured: true,
+    related: ['image-convert', 'image-resize', 'image-metadata-remove'],
+    status: 'planned',
+  },
+  {
+    slug: 'image-convert',
+    category: 'image',
+    titleKey: 'tools.image-convert.title',
+    descriptionKey: 'tools.image-convert.description',
+    keywords: ['convert', 'jpeg', 'png', 'webp', 'avif', '格式转换'],
+    aliases: ['image converter', '图片转换'],
+    icon: 'image-convert',
+    inputKinds: ['image/*'],
+    outputKinds: ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
+    localOnly: true,
+    featured: true,
+    related: ['image-compress', 'image-resize'],
+    status: 'planned',
+  },
+  {
+    slug: 'image-resize',
+    category: 'image',
+    titleKey: 'tools.image-resize.title',
+    descriptionKey: 'tools.image-resize.description',
+    keywords: ['resize', 'dimension', 'width', 'height', '缩放', '尺寸'],
+    aliases: ['resize image', '图片缩放'],
+    icon: 'image-resize',
+    inputKinds: ['image/*'],
+    outputKinds: ['image/*'],
+    localOnly: true,
+    featured: true,
+    related: ['image-compress', 'image-crop'],
+    status: 'planned',
+  },
+  {
+    slug: 'image-crop',
+    category: 'image',
+    titleKey: 'tools.image-crop.title',
+    descriptionKey: 'tools.image-crop.description',
+    keywords: ['crop', 'rotate', 'flip', '裁剪', '旋转'],
+    aliases: ['crop image', '图片裁剪'],
+    icon: 'image-crop',
+    inputKinds: ['image/*'],
+    outputKinds: ['image/*'],
+    localOnly: true,
+    related: ['image-resize', 'image-compress'],
+    status: 'planned',
+  },
+  {
+    slug: 'image-metadata-remove',
+    category: 'image',
+    titleKey: 'tools.image-metadata-remove.title',
+    descriptionKey: 'tools.image-metadata-remove.description',
+    keywords: ['metadata', 'exif', 'privacy', '元数据', '隐私'],
+    aliases: ['remove exif', '清除图片元数据'],
+    icon: 'image-privacy',
+    inputKinds: ['image/*'],
+    outputKinds: ['image/*'],
+    localOnly: true,
+    related: ['image-compress', 'image-convert'],
+    status: 'planned',
+  },
+  {
+    slug: 'pdf-merge',
+    category: 'pdf',
+    titleKey: 'tools.pdf-merge.title',
+    descriptionKey: 'tools.pdf-merge.description',
+    keywords: ['pdf', 'merge', 'combine', '合并'],
+    aliases: ['merge pdf', 'PDF 合并'],
+    icon: 'pdf-merge',
+    inputKinds: ['application/pdf'],
+    outputKinds: ['application/pdf'],
+    localOnly: true,
+    featured: true,
+    related: ['pdf-split', 'image-to-pdf'],
+    status: 'planned',
+  },
+  {
+    slug: 'pdf-split',
+    category: 'pdf',
+    titleKey: 'tools.pdf-split.title',
+    descriptionKey: 'tools.pdf-split.description',
+    keywords: ['pdf', 'split', 'extract', '拆分', '提取'],
+    aliases: ['split pdf', 'PDF 拆分'],
+    icon: 'pdf-split',
+    inputKinds: ['application/pdf'],
+    outputKinds: ['application/pdf'],
+    localOnly: true,
+    featured: true,
+    related: ['pdf-merge', 'pdf-to-image'],
+    status: 'planned',
+  },
+  {
+    slug: 'image-to-pdf',
+    category: 'pdf',
+    titleKey: 'tools.image-to-pdf.title',
+    descriptionKey: 'tools.image-to-pdf.description',
+    keywords: ['image', 'pdf', 'convert', '图片转PDF'],
+    aliases: ['image to pdf', '图片转 PDF'],
+    icon: 'image-to-pdf',
+    inputKinds: ['image/*'],
+    outputKinds: ['application/pdf'],
+    localOnly: true,
+    related: ['pdf-merge', 'pdf-to-image'],
+    status: 'planned',
+  },
+  {
+    slug: 'pdf-to-image',
+    category: 'pdf',
+    titleKey: 'tools.pdf-to-image.title',
+    descriptionKey: 'tools.pdf-to-image.description',
+    keywords: ['pdf', 'image', 'png', 'jpeg', 'PDF转图片'],
+    aliases: ['pdf to image', 'PDF 转图片'],
+    icon: 'pdf-to-image',
+    inputKinds: ['application/pdf'],
+    outputKinds: ['image/png', 'image/jpeg', 'image/webp'],
+    localOnly: true,
+    related: ['image-to-pdf', 'pdf-split'],
+    status: 'planned',
+  },
+  {
+    slug: 'json-format',
+    category: 'text',
+    titleKey: 'tools.json-format.title',
+    descriptionKey: 'tools.json-format.description',
+    keywords: ['json', 'format', 'minify', 'validate', '格式化', '校验'],
+    aliases: ['json formatter', 'JSON 格式化'],
+    icon: 'json',
+    inputKinds: ['text/plain', 'application/json'],
+    outputKinds: ['text/plain', 'application/json'],
+    localOnly: true,
+    featured: true,
+    related: ['base64', 'url-codec'],
+    status: 'planned',
+  },
+  {
+    slug: 'base64',
+    category: 'text',
+    titleKey: 'tools.base64.title',
+    descriptionKey: 'tools.base64.description',
+    keywords: ['base64', 'encode', 'decode', '编码', '解码'],
+    aliases: ['base64 encoder', 'Base64 编解码'],
+    icon: 'base64',
+    inputKinds: ['text/plain', 'file/*'],
+    outputKinds: ['text/plain', 'file/*'],
+    localOnly: true,
+    featured: true,
+    related: ['url-codec', 'hash'],
+    status: 'planned',
+  },
+  {
+    slug: 'url-codec',
+    category: 'text',
+    titleKey: 'tools.url-codec.title',
+    descriptionKey: 'tools.url-codec.description',
+    keywords: ['url', 'encode', 'decode', 'uri', '编码'],
+    aliases: ['url encode', 'URL 编解码'],
+    icon: 'url',
+    inputKinds: ['text/plain'],
+    outputKinds: ['text/plain'],
+    localOnly: true,
+    related: ['base64', 'json-format'],
+    status: 'planned',
+  },
+  {
+    slug: 'text-stats',
+    category: 'text',
+    titleKey: 'tools.text-stats.title',
+    descriptionKey: 'tools.text-stats.description',
+    keywords: ['text', 'count', 'words', 'characters', '字数', '字符'],
+    aliases: ['word count', '字数统计'],
+    icon: 'text-stats',
+    inputKinds: ['text/plain'],
+    outputKinds: ['text/plain'],
+    localOnly: true,
+    related: ['text-clean', 'json-format'],
+    status: 'planned',
+  },
+  {
+    slug: 'text-clean',
+    category: 'text',
+    titleKey: 'tools.text-clean.title',
+    descriptionKey: 'tools.text-clean.description',
+    keywords: ['text', 'deduplicate', 'sort', 'lines', '去重', '排序'],
+    aliases: ['clean text', '文本整理'],
+    icon: 'text-clean',
+    inputKinds: ['text/plain'],
+    outputKinds: ['text/plain'],
+    localOnly: true,
+    related: ['text-stats', 'json-format'],
+    status: 'planned',
+  },
+  {
+    slug: 'uuid',
+    category: 'developer',
+    titleKey: 'tools.uuid.title',
+    descriptionKey: 'tools.uuid.description',
+    keywords: ['uuid', 'guid', 'random', '生成'],
+    aliases: ['uuid generator', 'UUID 生成'],
+    icon: 'uuid',
+    inputKinds: [],
+    outputKinds: ['text/plain'],
+    localOnly: true,
+    featured: true,
+    related: ['hash', 'timestamp'],
+    status: 'planned',
+  },
+  {
+    slug: 'timestamp',
+    category: 'developer',
+    titleKey: 'tools.timestamp.title',
+    descriptionKey: 'tools.timestamp.description',
+    keywords: ['timestamp', 'unix', 'date', 'time', '时间戳'],
+    aliases: ['unix timestamp', '时间戳转换'],
+    icon: 'timestamp',
+    inputKinds: ['text/plain'],
+    outputKinds: ['text/plain'],
+    localOnly: true,
+    related: ['uuid', 'hash'],
+    status: 'planned',
+  },
+  {
+    slug: 'hash',
+    category: 'developer',
+    titleKey: 'tools.hash.title',
+    descriptionKey: 'tools.hash.description',
+    keywords: ['hash', 'sha256', 'sha384', 'sha512', '摘要'],
+    aliases: ['sha hash', 'Hash 计算'],
+    icon: 'hash',
+    inputKinds: ['text/plain', 'file/*'],
+    outputKinds: ['text/plain'],
+    localOnly: true,
+    featured: true,
+    related: ['uuid', 'base64'],
+    status: 'planned',
+  },
+  {
+    slug: 'jwt-decode',
+    category: 'developer',
+    titleKey: 'tools.jwt-decode.title',
+    descriptionKey: 'tools.jwt-decode.description',
+    keywords: ['jwt', 'token', 'decode', '解析'],
+    aliases: ['jwt decoder', 'JWT 解析'],
+    icon: 'jwt',
+    inputKinds: ['text/plain'],
+    outputKinds: ['application/json'],
+    localOnly: true,
+    related: ['base64', 'json-format'],
+    status: 'planned',
+  },
+  {
+    slug: 'regex',
+    category: 'developer',
+    titleKey: 'tools.regex.title',
+    descriptionKey: 'tools.regex.description',
+    keywords: ['regex', 'regexp', 'regular expression', '正则'],
+    aliases: ['regex tester', '正则测试'],
+    icon: 'regex',
+    inputKinds: ['text/plain'],
+    outputKinds: ['text/plain'],
+    localOnly: true,
+    related: ['text-clean', 'json-format'],
+    status: 'planned',
+  },
+] as const
+
+export type ToolSlug = (typeof RAW_TOOLS)[number]['slug']
+
+const parsedTools = ToolRegistrySchema.parse(RAW_TOOLS)
+const slugs = new Set(parsedTools.map((tool) => tool.slug))
+
+if (slugs.size !== parsedTools.length) {
+  throw new Error('Tool registry contains duplicate slugs')
+}
+
+for (const tool of parsedTools) {
+  for (const relatedSlug of tool.related) {
+    if (!slugs.has(relatedSlug)) {
+      throw new Error(`Tool ${tool.slug} references unknown related tool ${relatedSlug}`)
+    }
+  }
+}
+
+export const tools: readonly ToolDefinition[] = Object.freeze(parsedTools)
+export const TOOL_CATEGORIES: readonly ToolCategory[] = ['image', 'pdf', 'text', 'developer', 'utility']
+
+export function isToolSlug(value: string): value is ToolSlug {
+  return slugs.has(value)
+}
+
+export function getToolBySlug(slug: string): ToolDefinition | undefined {
+  return tools.find((tool) => tool.slug === slug)
+}
+
+export function getToolsByCategory(category: ToolCategory): readonly ToolDefinition[] {
+  return tools.filter((tool) => tool.category === category)
+}
+
+export function getRelatedTools(tool: ToolDefinition): readonly ToolDefinition[] {
+  return tool.related.flatMap((slug) => {
+    const related = getToolBySlug(slug)
+    return related ? [related] : []
+  })
+}

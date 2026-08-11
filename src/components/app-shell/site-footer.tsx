@@ -1,23 +1,27 @@
 import Link from 'next/link'
+import type { Locale } from '@/i18n/config'
+import type { Messages } from '@/i18n/messages'
 import { Container } from './container'
 
-export function SiteFooter() {
+export function SiteFooter({ locale, messages }: { locale: Locale; messages: Messages }) {
   return (
     <footer className="border-t border-border/70 py-10">
       <Container className="flex flex-col gap-5 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-medium text-foreground">LightTools · 轻工具</p>
-          <p className="mt-1">打开即用，尽量在浏览器本地完成。</p>
+          <p className="font-medium text-foreground">
+            {messages.brand.name} · {messages.brand.chineseName}
+          </p>
+          <p className="mt-1">{messages.brand.tagline}</p>
         </div>
-        <nav aria-label="页脚导航" className="flex flex-wrap gap-4">
-          <Link href="/privacy" className="hover:text-foreground">
-            隐私
+        <nav aria-label={messages.nav.footerLabel} className="flex flex-wrap gap-4">
+          <Link href={`/${locale}/privacy`} className="hover:text-foreground">
+            {messages.footer.privacy}
           </Link>
-          <Link href="/terms" className="hover:text-foreground">
-            条款
+          <Link href={`/${locale}/terms`} className="hover:text-foreground">
+            {messages.footer.terms}
           </Link>
           <a href="https://github.com/realreus319/LightTools" className="hover:text-foreground">
-            GitHub
+            {messages.footer.github}
           </a>
         </nav>
       </Container>

@@ -3,21 +3,27 @@
 import { Button } from '@appica/ui-react/button'
 import { useTheme } from '@appica/ui-react/hooks/use-theme'
 
-const THEME_ORDER = ['system', 'light', 'dark'] as const
-
-const LABELS: Record<(typeof THEME_ORDER)[number], string> = {
-  system: '跟随系统',
-  light: '浅色',
-  dark: '深色',
+type ThemeLabels = {
+  switchLabel: string
+  system: string
+  light: string
+  dark: string
 }
 
-export function ThemeToggle() {
+const THEME_ORDER = ['system', 'light', 'dark'] as const
+
+export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
   const { theme, setTheme, mounted } = useTheme()
+  const displayLabels = {
+    system: labels.system,
+    light: labels.light,
+    dark: labels.dark,
+  }
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="sm" aria-label="切换主题" disabled>
-        主题
+      <Button variant="ghost" size="sm" aria-label={labels.switchLabel} disabled>
+        {labels.switchLabel}
       </Button>
     )
   }
@@ -32,10 +38,10 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="sm"
-      aria-label={`当前主题：${LABELS[currentTheme]}，点击切换为${LABELS[nextTheme]}`}
+      aria-label={`${labels.switchLabel}: ${displayLabels[currentTheme]} → ${displayLabels[nextTheme]}`}
       onClick={() => setTheme(nextTheme)}
     >
-      {LABELS[currentTheme]}
+      {displayLabels[currentTheme]}
     </Button>
   )
 }
