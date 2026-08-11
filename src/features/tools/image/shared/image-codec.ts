@@ -7,7 +7,11 @@ function normalizeQuality(quality: number): number {
   return Math.max(1, Math.min(100, Math.round(quality)))
 }
 
-function requireEightBitImageData(value: { data: Uint8ClampedArray | Uint16Array; width: number; height: number }): ImageData {
+function requireEightBitImageData(value: {
+  data: Uint8ClampedArray | Uint16Array
+  width: number
+  height: number
+}): ImageData {
   if (!(value.data instanceof Uint8ClampedArray)) {
     throw new ToolError('DECODE_FAILED', 'Only 8-bit image data is supported', { stage: 'decode' })
   }
@@ -41,7 +45,11 @@ async function decodeImage(buffer: ArrayBuffer, mime: SupportedImageMime): Promi
   }
 }
 
-async function resizeImage(image: ImageData, maxWidth?: number, maxHeight?: number): Promise<ImageData> {
+async function resizeImage(
+  image: ImageData,
+  maxWidth?: number,
+  maxHeight?: number,
+): Promise<ImageData> {
   const dimensions = calculateFitDimensions(
     { width: image.width, height: image.height },
     { maxWidth, maxHeight },
@@ -57,7 +65,10 @@ async function resizeImage(image: ImageData, maxWidth?: number, maxHeight?: numb
       fitMethod: 'stretch',
     })
   } catch (error) {
-    throw new ToolError('ENCODE_FAILED', 'Image resize failed', { stage: 'transform', cause: error })
+    throw new ToolError('ENCODE_FAILED', 'Image resize failed', {
+      stage: 'transform',
+      cause: error,
+    })
   }
 }
 
@@ -111,7 +122,9 @@ export async function processImage(payload: ImageProcessPayload): Promise<ImageP
   const quality = normalizeQuality(payload.quality)
   let image = await decodeImage(payload.buffer, payload.inputMime)
   if (image.width * image.height > 80_000_000) {
-    throw new ToolError('IMAGE_TOO_LARGE', 'Decoded image exceeds pixel safety limit', { stage: 'decode' })
+    throw new ToolError('IMAGE_TOO_LARGE', 'Decoded image exceeds pixel safety limit', {
+      stage: 'decode',
+    })
   }
 
   image = await resizeImage(image, payload.maxWidth, payload.maxHeight)

@@ -192,7 +192,9 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
     <div className="space-y-6">
       <section className="grid gap-4 rounded-3xl border border-border bg-background p-5 sm:grid-cols-3 sm:p-6">
         <label className="grid gap-2 text-sm font-medium">
-          <span>{copy.quality}: {quality}</span>
+          <span>
+            {copy.quality}: {quality}
+          </span>
           <input
             type="range"
             min="1"
@@ -239,7 +241,10 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
       />
 
       {batchError ? (
-        <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        <div
+          role="alert"
+          className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+        >
           <strong>{copy.batchError}:</strong> {batchError}
         </div>
       ) : null}
@@ -276,16 +281,21 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
                 ? Math.round((1 - itemStats.outputBytes / item.file.size) * 100)
                 : 0
               return (
-                <article key={item.id} className="rounded-2xl border border-border bg-background p-4">
+                <article
+                  key={item.id}
+                  className="rounded-2xl border border-border bg-background p-4"
+                >
                   <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
                     <div className="min-w-0">
                       <p className="truncate font-medium" title={item.result.fileName}>
                         {item.result.fileName}
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        {copy.originalSize}: {formatFileSize(item.file.size, locale)} · {copy.resultSize}:{' '}
-                        {formatFileSize(item.result.blob.size, locale)}
-                        {itemStats ? ` · ${copy.saved}: ${savings}% · ${copy.dimensions}: ${itemStats.width}×${itemStats.height}` : ''}
+                        {copy.originalSize}: {formatFileSize(item.file.size, locale)} ·{' '}
+                        {copy.resultSize}: {formatFileSize(item.result.blob.size, locale)}
+                        {itemStats
+                          ? ` · ${copy.saved}: ${savings}% · ${copy.dimensions}: ${itemStats.width}×${itemStats.height}`
+                          : ''}
                       </p>
                     </div>
                     <Button onClick={() => downloadBlob(item.result!.blob, item.result!.fileName)}>

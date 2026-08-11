@@ -37,7 +37,8 @@ export function getImageCompressCopy(locale: Locale) {
   return {
     dropzone: {
       title: 'Drop images here to compress',
-      description: 'Supports JPEG, PNG, WebP, and AVIF. Files are validated locally before browser workers process them.',
+      description:
+        'Supports JPEG, PNG, WebP, and AVIF. Files are validated locally before browser workers process them.',
       chooseFiles: 'Choose images',
       dropActive: 'Release to add images',
     },
@@ -62,6 +63,7 @@ export function getImageCompressCopy(locale: Locale) {
       remove: 'Remove',
     },
     batchError: 'This batch could not be added',
-    pngQualityNote: 'PNG uses lossless encoding, so the quality slider does not change PNG output quality.',
+    pngQualityNote:
+      'PNG uses lossless encoding, so the quality slider does not change PNG output quality.',
   }
 }

@@ -3,7 +3,9 @@ import { createImageOutputName } from '../src/features/tools/image/shared/image-
 
 describe('createImageOutputName', () => {
   it('replaces the original extension with the selected format', () => {
-    expect(createImageOutputName('holiday.photo.PNG', 'image/webp')).toBe('holiday.photo-lighttools.webp')
+    expect(createImageOutputName('holiday.photo.PNG', 'image/webp')).toBe(
+      'holiday.photo-lighttools.webp',
+    )
   })
 
   it('drops supplied path segments', () => {

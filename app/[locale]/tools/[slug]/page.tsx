@@ -7,12 +7,7 @@ import { ToolPageShell } from '@/components/tool-shell/tool-page-shell'
 import { ImageCompressTool } from '@/features/tools/image/image-compress/image-compress-tool'
 import { getAlternateLocale, isLocale, locales } from '@/i18n/config'
 import { getMessages, getToolCopy } from '@/i18n/messages'
-import {
-  getRelatedTools,
-  getToolBySlug,
-  tools,
-  type ToolSlug,
-} from '@/lib/tool-registry/tools'
+import { getRelatedTools, getToolBySlug, tools, type ToolSlug } from '@/lib/tool-registry/tools'
 
 export function generateStaticParams() {
   return locales.flatMap((locale) => tools.map((tool) => ({ locale, slug: tool.slug })))
@@ -33,7 +28,8 @@ export default async function ToolPage({
   const copy = getToolCopy(locale, tool.slug as ToolSlug)
   const alternateLocale = getAlternateLocale(locale)
   const related = getRelatedTools(tool)
-  const toolContent = tool.slug === 'image-compress' ? <ImageCompressTool locale={locale} /> : undefined
+  const toolContent =
+    tool.slug === 'image-compress' ? <ImageCompressTool locale={locale} /> : undefined
 
   return (
     <>
@@ -58,7 +54,9 @@ export default async function ToolPage({
 
       <section className="border-t border-border/60 py-12 sm:py-16">
         <Container>
-          <h2 className="text-2xl font-semibold tracking-tight">{messages.toolPage.relatedTitle}</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            {messages.toolPage.relatedTitle}
+          </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((relatedTool) => {
               const relatedCopy = getToolCopy(locale, relatedTool.slug as ToolSlug)
