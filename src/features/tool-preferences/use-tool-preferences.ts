@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useSyncExternalStore } from 'react'
+import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import { isToolSlug, type ToolSlug } from '@/lib/tool-registry/tools'
 
 const STORAGE_KEY = 'lighttools:tool-preferences:v1'
@@ -60,23 +60,25 @@ function writePreferences(preferences: ToolPreferences): void {
 export function useToolPreferences() {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
   const preferences = useMemo(() => parseSnapshot(snapshot), [snapshot])
+  const addRecent = useCallback((slug: ToolSlug) => {
+    const current = parseSnapshot(getSnapshot())
+    writePreferences({
+      ...current,
+      recent: [slug, ...current.recent.filter((item) => item !== slug)].slice(0, RECENT_LIMIT),
+    })
+  }, [])
+  const toggleFavorite = useCallback((slug: ToolSlug) => {
+    const current = parseSnapshot(getSnapshot())
+    const exists = current.favorites.includes(slug)
+    writePreferences({
+      ...current,
+      favorites: exists ? current.favorites.filter((item) => item !== slug) : [slug, ...current.favorites],
+    })
+  }, [])
 
   return {
     ...preferences,
-    addRecent(slug: ToolSlug) {
-      const current = parseSnapshot(getSnapshot())
-      writePreferences({
-        ...current,
-        recent: [slug, ...current.recent.filter((item) => item !== slug)].slice(0, RECENT_LIMIT),
-      })
-    },
-    toggleFavorite(slug: ToolSlug) {
-      const current = parseSnapshot(getSnapshot())
-      const exists = current.favorites.includes(slug)
-      writePreferences({
-        ...current,
-        favorites: exists ? current.favorites.filter((item) => item !== slug) : [slug, ...current.favorites],
-      })
-    },
+    addRecent,
+    toggleFavorite,
   }
 }
