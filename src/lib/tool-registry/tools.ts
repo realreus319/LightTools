@@ -297,7 +297,13 @@ for (const tool of parsedTools) {
 }
 
 export const tools: readonly ToolDefinition[] = Object.freeze(parsedTools)
-export const TOOL_CATEGORIES: readonly ToolCategory[] = ['image', 'pdf', 'text', 'developer', 'utility']
+export const TOOL_CATEGORIES: readonly ToolCategory[] = [
+  'image',
+  'pdf',
+  'text',
+  'developer',
+  'utility',
+]
 
 export function isToolSlug(value: string): value is ToolSlug {
   return slugs.has(value)

@@ -72,7 +72,9 @@ export function useToolPreferences() {
     const exists = current.favorites.includes(slug)
     writePreferences({
       ...current,
-      favorites: exists ? current.favorites.filter((item) => item !== slug) : [slug, ...current.favorites],
+      favorites: exists
+        ? current.favorites.filter((item) => item !== slug)
+        : [slug, ...current.favorites],
     })
   }, [])
 

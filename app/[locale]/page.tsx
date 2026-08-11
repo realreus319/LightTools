@@ -17,7 +17,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   if (!isLocale(rawLocale)) notFound()
   const locale = rawLocale
   const messages = getMessages(locale)
-  const visibleCategories = TOOL_CATEGORIES.filter((category) => tools.some((tool) => tool.category === category))
+  const visibleCategories = TOOL_CATEGORIES.filter((category) =>
+    tools.some((tool) => tool.category === category),
+  )
   const toolItems = tools.map((tool) => {
     const copy = getToolCopy(locale, tool.slug as ToolSlug)
     return {
@@ -54,10 +56,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 {messages.home.description}
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <a href="#image-tools" className={buttonVariants({ variant: 'primary', size: 'lg' })}>
+                <a
+                  href="#image-tools"
+                  className={buttonVariants({ variant: 'primary', size: 'lg' })}
+                >
                   {messages.home.browseTools}
                 </a>
-                <a href="#privacy-first" className={buttonVariants({ variant: 'outline', size: 'lg' })}>
+                <a
+                  href="#privacy-first"
+                  className={buttonVariants({ variant: 'outline', size: 'lg' })}
+                >
                   {messages.home.privacyAction}
                 </a>
               </div>
@@ -98,19 +106,33 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           })}
         </Container>
 
-        <section id="privacy-first" className="border-t border-border/60 bg-background-muted/40 py-14 sm:py-20">
+        <section
+          id="privacy-first"
+          className="border-t border-border/60 bg-background-muted/40 py-14 sm:py-20"
+        >
           <Container>
             <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-start">
               <div>
-                <p className="text-sm font-semibold text-[var(--lt-brand)]">{messages.home.privacyEyebrow}</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{messages.home.privacyTitle}</h2>
+                <p className="text-sm font-semibold text-[var(--lt-brand)]">
+                  {messages.home.privacyEyebrow}
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+                  {messages.home.privacyTitle}
+                </h2>
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 {messages.home.privacySteps.map((step) => (
-                  <div key={step.number} className="rounded-2xl border border-border bg-background p-5">
-                    <span className="text-xs font-semibold text-[var(--lt-brand)]">{step.number}</span>
+                  <div
+                    key={step.number}
+                    className="rounded-2xl border border-border bg-background p-5"
+                  >
+                    <span className="text-xs font-semibold text-[var(--lt-brand)]">
+                      {step.number}
+                    </span>
                     <h3 className="mt-4 font-semibold">{step.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.description}</p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {step.description}
+                    </p>
                   </div>
                 ))}
               </div>

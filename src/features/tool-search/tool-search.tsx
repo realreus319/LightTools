@@ -85,12 +85,16 @@ export function ToolSearch({ items, labels }: ToolSearchProps) {
                       <span className="text-xs text-muted-foreground">{labels.planned}</span>
                     ) : null}
                   </div>
-                  <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">{item.description}</p>
+                  <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="px-4 py-6 text-center text-sm text-muted-foreground">{labels.noResults}</p>
+            <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+              {labels.noResults}
+            </p>
           )}
         </div>
       ) : null}

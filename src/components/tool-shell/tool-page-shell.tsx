@@ -29,7 +29,10 @@ export function ToolPageShell({
   return (
     <main id="main-content">
       <Container className="py-10 sm:py-14">
-        <nav aria-label="Breadcrumb" className="mb-7 flex items-center gap-2 text-sm text-muted-foreground">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-7 flex items-center gap-2 text-sm text-muted-foreground"
+        >
           <Link href={`/${locale}`} className="hover:text-foreground">
             {messages.toolPage.breadcrumbHome}
           </Link>
@@ -43,10 +46,14 @@ export function ToolPageShell({
           <div className="max-w-3xl">
             <div className="flex flex-wrap gap-2">
               {tool.localOnly ? <Badge variant="soft">{messages.toolPage.localBadge}</Badge> : null}
-              {tool.status === 'planned' ? <Badge variant="soft">{messages.toolCard.planned}</Badge> : null}
+              {tool.status === 'planned' ? (
+                <Badge variant="soft">{messages.toolCard.planned}</Badge>
+              ) : null}
             </div>
             <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">{title}</h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">{description}</p>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
+              {description}
+            </p>
           </div>
           <ToolPreferenceControls slug={slug} labels={messages.preferences} />
         </div>

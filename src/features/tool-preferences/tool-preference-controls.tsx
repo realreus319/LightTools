@@ -20,7 +20,12 @@ export function ToolPreferenceControls({
   }, [addRecent, slug])
 
   return (
-    <Button variant="outline" size="sm" onClick={() => toggleFavorite(slug)} aria-pressed={isFavorite}>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => toggleFavorite(slug)}
+      aria-pressed={isFavorite}
+    >
       {isFavorite ? labels.removeFavorite : labels.addFavorite}
     </Button>
   )

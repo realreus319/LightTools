@@ -29,7 +29,8 @@ export function ToolCard({
   labels,
   localOnly = true,
 }: ToolCardProps) {
-  const statusLabel = status === 'stable' ? labels.stable : status === 'beta' ? labels.beta : labels.planned
+  const statusLabel =
+    status === 'stable' ? labels.stable : status === 'beta' ? labels.beta : labels.planned
 
   return (
     <Link
@@ -37,7 +38,9 @@ export function ToolCard({
       className="group block min-h-52 rounded-[var(--lt-radius-card)] border border-border/80 bg-background p-5 transition-[transform,box-shadow,border-color] hover:-translate-y-0.5 hover:border-[var(--lt-brand)] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lt-brand)] focus-visible:ring-offset-2"
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{category}</span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {category}
+        </span>
         <div className="flex flex-wrap justify-end gap-1.5">
           {localOnly ? (
             <Badge variant="soft" size="sm">
