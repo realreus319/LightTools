@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'feat/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+          run_install: false
+      - name: Inspect Appica metadata
+        run: |
+          npm view @appica/ui-react version
+          npm view @appica/ui-react license
+          npm view @appica/ui-react repository.url
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Report resolved direct dependencies
+        run: pnpm list --depth=0
+      - name: Check formatting
+        run: pnpm format:check
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
