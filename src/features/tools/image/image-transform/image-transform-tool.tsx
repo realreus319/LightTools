@@ -59,7 +59,8 @@ export function ImageTransformTool({ locale, mode }: ImageTransformToolProps) {
 
       try {
         const validation = await validateFile(item.file, IMAGE_FILE_POLICY)
-        if (!isSupportedImageMime(validation.mimeType)) throw new TypeError('Unsupported validated image MIME')
+        if (!isSupportedImageMime(validation.mimeType))
+          throw new TypeError('Unsupported validated image MIME')
         const inputMime = validation.mimeType
         const width = Number.parseInt(maxWidth, 10)
         const height = Number.parseInt(maxHeight, 10)
@@ -70,7 +71,9 @@ export function ImageTransformTool({ locale, mode }: ImageTransformToolProps) {
           outputMime: mode === 'convert' ? outputMime : inputMime,
           quality,
           ...(mode === 'resize' && Number.isFinite(width) && width > 0 ? { maxWidth: width } : {}),
-          ...(mode === 'resize' && Number.isFinite(height) && height > 0 ? { maxHeight: height } : {}),
+          ...(mode === 'resize' && Number.isFinite(height) && height > 0
+            ? { maxHeight: height }
+            : {}),
         }
         const result = await getPool().run<ImageProcessResult>('process-image', payload, {
           signal: controller.signal,
@@ -183,26 +186,54 @@ export function ImageTransformTool({ locale, mode }: ImageTransformToolProps) {
             <>
               <label className="grid gap-2 text-sm font-medium">
                 <span>{copy.width}</span>
-                <Input type="number" min="1" inputMode="numeric" value={maxWidth} onChange={(event) => setMaxWidth(event.currentTarget.value)} />
+                <Input
+                  type="number"
+                  min="1"
+                  inputMode="numeric"
+                  value={maxWidth}
+                  onChange={(event) => setMaxWidth(event.currentTarget.value)}
+                />
               </label>
               <label className="grid gap-2 text-sm font-medium">
                 <span>{copy.height}</span>
-                <Input type="number" min="1" inputMode="numeric" value={maxHeight} onChange={(event) => setMaxHeight(event.currentTarget.value)} />
+                <Input
+                  type="number"
+                  min="1"
+                  inputMode="numeric"
+                  value={maxHeight}
+                  onChange={(event) => setMaxHeight(event.currentTarget.value)}
+                />
               </label>
             </>
           ) : null}
           {mode === 'convert' ? (
             <label className="grid gap-2 text-sm font-medium">
-              <span>{copy.quality}: {quality}</span>
-              <input type="range" min="1" max="100" value={quality} onChange={(event) => setQuality(event.currentTarget.valueAsNumber)} className="accent-[var(--lt-brand)]" />
+              <span>
+                {copy.quality}: {quality}
+              </span>
+              <input
+                type="range"
+                min="1"
+                max="100"
+                value={quality}
+                onChange={(event) => setQuality(event.currentTarget.valueAsNumber)}
+                className="accent-[var(--lt-brand)]"
+              />
             </label>
           ) : null}
         </section>
       ) : null}
 
-      <FileDropzone policy={IMAGE_FILE_POLICY} labels={copy.dropzone} onFilesSelected={handleFilesSelected} />
+      <FileDropzone
+        policy={IMAGE_FILE_POLICY}
+        labels={copy.dropzone}
+        onFilesSelected={handleFilesSelected}
+      />
       {batchError ? (
-        <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        <div
+          role="alert"
+          className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+        >
           <strong>{copy.batchError}:</strong> {batchError}
         </div>
       ) : null}
@@ -210,7 +241,9 @@ export function ImageTransformTool({ locale, mode }: ImageTransformToolProps) {
         items={items}
         locale={locale}
         labels={copy.queue}
-        getErrorMessage={(item) => (item.error ? getToolErrorMessage(locale, item.error.code) : undefined)}
+        getErrorMessage={(item) =>
+          item.error ? getToolErrorMessage(locale, item.error.code) : undefined
+        }
         onRetry={retry}
         onRemove={remove}
       />
@@ -220,8 +253,12 @@ export function ImageTransformTool({ locale, mode }: ImageTransformToolProps) {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold">{copy.result}</h2>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => void downloadAll()}>{copy.downloadAll}</Button>
-              <Button variant="ghost" onClick={clearAll}>{copy.clearAll}</Button>
+              <Button variant="outline" onClick={() => void downloadAll()}>
+                {copy.downloadAll}
+              </Button>
+              <Button variant="ghost" onClick={clearAll}>
+                {copy.clearAll}
+              </Button>
             </div>
           </div>
           <div className="grid gap-3">
@@ -229,12 +266,22 @@ export function ImageTransformTool({ locale, mode }: ImageTransformToolProps) {
               const result = item.result
               if (!result) return null
               return (
-                <article key={item.id} className="flex flex-col gap-3 rounded-2xl border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between">
+                <article
+                  key={item.id}
+                  className="flex flex-col gap-3 rounded-2xl border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
                   <div className="min-w-0">
-                    <p className="truncate font-medium" title={result.fileName}>{result.fileName}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{formatFileSize(item.file.size, locale)} → {formatFileSize(result.blob.size, locale)}</p>
+                    <p className="truncate font-medium" title={result.fileName}>
+                      {result.fileName}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {formatFileSize(item.file.size, locale)} →{' '}
+                      {formatFileSize(result.blob.size, locale)}
+                    </p>
                   </div>
-                  <Button onClick={() => downloadBlob(result.blob, result.fileName)}>{copy.download}</Button>
+                  <Button onClick={() => downloadBlob(result.blob, result.fileName)}>
+                    {copy.download}
+                  </Button>
                 </article>
               )
             })}

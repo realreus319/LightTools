@@ -2,7 +2,10 @@ import { WorkerClientPool, getRecommendedWorkerCount } from '@/lib/workers/worke
 
 export function createImageWorkerPool(): WorkerClientPool {
   return new WorkerClientPool(
-    () => new Worker(new URL('../image-compress/image-compress.worker.ts', import.meta.url), { type: 'module' }),
+    () =>
+      new Worker(new URL('../image-compress/image-compress.worker.ts', import.meta.url), {
+        type: 'module',
+      }),
     getRecommendedWorkerCount(2),
   )
 }
