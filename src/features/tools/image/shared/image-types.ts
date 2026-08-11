@@ -14,6 +14,7 @@ export type ImageProcessPayload = {
   quality: number
   maxWidth?: number
   maxHeight?: number
+  targetBytes?: number
   jpegBackground?: readonly [number, number, number]
 }
 
@@ -23,6 +24,8 @@ export type ImageProcessResult = {
   width: number
   height: number
   quality: number
+  attempts: number
+  targetReached?: boolean
 }
 
 export function isSupportedImageMime(value: string): value is SupportedImageMime {

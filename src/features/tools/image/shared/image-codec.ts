@@ -1,6 +1,11 @@
 import { ToolError } from '@/lib/errors/tool-error'
 import { calculateFitDimensions } from './image-dimensions'
 import type { ImageProcessPayload, ImageProcessResult, SupportedImageMime } from './image-types'
+import { calculateTargetResizeScale, findHighestQualityAtTarget } from './target-size-search'
+
+const MAX_TARGET_ATTEMPTS = 18
+const MAX_RESIZE_ROUNDS = 6
+const MIN_TARGET_DIMENSION = 24
 
 function normalizeQuality(quality: number): number {
   if (!Number.isFinite(quality)) return 80
@@ -8,11 +13,13 @@ function normalizeQuality(quality: number): number {
 }
 
 function requireEightBitImageData(
-  value: {
-    data: Uint8ClampedArray | Uint16Array
-    width: number
-    height: number
-  } | null,
+  value:
+    | {
+        data: Uint8ClampedArray | Uint16Array
+        width: number
+        height: number
+      }
+    | null,
 ): ImageData {
   if (!value) {
     throw new ToolError('DECODE_FAILED', 'Image decoder returned no pixels', { stage: 'decode' })
@@ -54,31 +61,22 @@ async function decodeImage(buffer: ArrayBuffer, mime: SupportedImageMime): Promi
   }
 }
 
-async function resizeImage(
-  image: ImageData,
-  maxWidth?: number,
-  maxHeight?: number,
-): Promise<ImageData> {
+async function resizeExact(image: ImageData, width: number, height: number): Promise<ImageData> {
+  if (width === image.width && height === image.height) return image
+  try {
+    const { default: resize } = await import('@jsquash/resize')
+    return await resize(image, { width, height, method: 'lanczos3', fitMethod: 'stretch' })
+  } catch (error) {
+    throw new ToolError('ENCODE_FAILED', 'Image resize failed', { stage: 'transform', cause: error })
+  }
+}
+
+async function resizeImage(image: ImageData, maxWidth?: number, maxHeight?: number): Promise<ImageData> {
   const dimensions = calculateFitDimensions(
     { width: image.width, height: image.height },
     { maxWidth, maxHeight },
   )
-  if (dimensions.width === image.width && dimensions.height === image.height) return image
-
-  try {
-    const { default: resize } = await import('@jsquash/resize')
-    return await resize(image, {
-      width: dimensions.width,
-      height: dimensions.height,
-      method: 'lanczos3',
-      fitMethod: 'stretch',
-    })
-  } catch (error) {
-    throw new ToolError('ENCODE_FAILED', 'Image resize failed', {
-      stage: 'transform',
-      cause: error,
-    })
-  }
+  return resizeExact(image, dimensions.width, dimensions.height)
 }
 
 function flattenAlpha(image: ImageData, background: readonly [number, number, number]): ImageData {
@@ -127,28 +125,97 @@ async function encodeImage(
   }
 }
 
+type TargetCandidate = {
+  buffer: ArrayBuffer
+  quality: number
+  image: ImageData
+}
+
+async function encodeToTarget(
+  initialImage: ImageData,
+  mime: SupportedImageMime,
+  maxQuality: number,
+  targetBytes: number,
+  jpegBackground: readonly [number, number, number],
+): Promise<{ candidate: TargetCandidate; attempts: number; targetReached: boolean }> {
+  let image = initialImage
+  let attempts = 0
+  let fallback: TargetCandidate | undefined
+
+  for (let resizeRound = 0; resizeRound <= MAX_RESIZE_ROUNDS && attempts < MAX_TARGET_ATTEMPTS; resizeRound += 1) {
+    if (mime === 'image/png') {
+      const buffer = await encodeImage(image, mime, maxQuality, jpegBackground)
+      attempts += 1
+      const candidate = { buffer, quality: maxQuality, image }
+      if (!fallback || buffer.byteLength < fallback.buffer.byteLength) fallback = candidate
+      if (buffer.byteLength <= targetBytes) return { candidate, attempts, targetReached: true }
+    } else {
+      const search = await findHighestQualityAtTarget({
+        targetBytes,
+        maxQuality,
+        maxAttempts: Math.min(8, MAX_TARGET_ATTEMPTS - attempts),
+        encode: async (quality) => {
+          const buffer = await encodeImage(image, mime, quality, jpegBackground)
+          return { value: buffer, bytes: buffer.byteLength }
+        },
+      })
+      attempts += search.attempts
+      if (search.best) {
+        return {
+          candidate: { buffer: search.best.value, quality: search.best.quality, image },
+          attempts,
+          targetReached: true,
+        }
+      }
+      if (search.smallest) {
+        const candidate = { buffer: search.smallest.value, quality: search.smallest.quality, image }
+        if (!fallback || candidate.buffer.byteLength < fallback.buffer.byteLength) fallback = candidate
+      }
+    }
+
+    if (!fallback || attempts >= MAX_TARGET_ATTEMPTS) break
+    const scale = calculateTargetResizeScale(targetBytes, fallback.buffer.byteLength)
+    const width = Math.max(MIN_TARGET_DIMENSION, Math.floor(image.width * scale))
+    const height = Math.max(MIN_TARGET_DIMENSION, Math.floor(image.height * scale))
+    if (width >= image.width || height >= image.height) break
+    image = await resizeExact(image, width, height)
+  }
+
+  if (!fallback) {
+    throw new ToolError('TARGET_SIZE_UNREACHABLE', 'No target-size candidate was produced', { stage: 'encode' })
+  }
+  return { candidate: fallback, attempts, targetReached: false }
+}
+
 export async function processImage(payload: ImageProcessPayload): Promise<ImageProcessResult> {
   const quality = normalizeQuality(payload.quality)
   let image = await decodeImage(payload.buffer, payload.inputMime)
   if (image.width * image.height > 80_000_000) {
-    throw new ToolError('IMAGE_TOO_LARGE', 'Decoded image exceeds pixel safety limit', {
-      stage: 'decode',
-    })
+    throw new ToolError('IMAGE_TOO_LARGE', 'Decoded image exceeds pixel safety limit', { stage: 'decode' })
   }
 
   image = await resizeImage(image, payload.maxWidth, payload.maxHeight)
-  const outputBuffer = await encodeImage(
-    image,
-    payload.outputMime,
-    quality,
-    payload.jpegBackground ?? [255, 255, 255],
-  )
+  const jpegBackground = payload.jpegBackground ?? [255, 255, 255]
+  if (payload.targetBytes && payload.targetBytes > 0) {
+    const targeted = await encodeToTarget(image, payload.outputMime, quality, payload.targetBytes, jpegBackground)
+    return {
+      buffer: targeted.candidate.buffer,
+      mime: payload.outputMime,
+      width: targeted.candidate.image.width,
+      height: targeted.candidate.image.height,
+      quality: targeted.candidate.quality,
+      attempts: targeted.attempts,
+      targetReached: targeted.targetReached,
+    }
+  }
 
+  const outputBuffer = await encodeImage(image, payload.outputMime, quality, jpegBackground)
   return {
     buffer: outputBuffer,
     mime: payload.outputMime,
     width: image.width,
     height: image.height,
     quality,
+    attempts: 1,
   }
 }
