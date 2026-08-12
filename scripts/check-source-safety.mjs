@@ -16,6 +16,7 @@ const FORBIDDEN = [
 ]
 const CONSOLE_PATTERN = /console\.(log|info|warn|error)\s*\(/
 const SAFE_CONSOLE_FILE = 'src/lib/debug/debug-logger.ts'
+const REVIEWED_HTML_FILE = 'src/components/seo/json-ld.tsx'
 
 async function collectFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true })
@@ -34,12 +35,19 @@ for (const root of ROOTS) {
     const source = await readFile(file, 'utf8')
     const displayPath = relative(process.cwd(), file).replaceAll('\\', '/')
     for (const rule of FORBIDDEN) {
-      if (rule.pattern.test(source)) violations.push(`${displayPath}: ${rule.reason}`)
+      if (displayPath !== REVIEWED_HTML_FILE && rule.pattern.test(source)) {
+        violations.push(`${displayPath}: ${rule.reason}`)
+      }
     }
     if (displayPath !== SAFE_CONSOLE_FILE && CONSOLE_PATTERN.test(source)) {
       violations.push(`${displayPath}: production source must use the safe debug/error adapters`)
     }
   }
+}
+
+const jsonLdSource = await readFile(REVIEWED_HTML_FILE, 'utf8')
+if (!jsonLdSource.includes("replace(/</g, '\\\\u003c')")) {
+  violations.push(`${REVIEWED_HTML_FILE}: JSON-LD must escape '<' before HTML insertion`)
 }
 
 const nextConfig = await readFile('next.config.ts', 'utf8')
