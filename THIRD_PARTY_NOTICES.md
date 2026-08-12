@@ -15,11 +15,17 @@ LightTools tracks third-party dependencies before commercial release. The commit
 | @jsquash/webp                  | 1.5.0   | WebP WASM encode/decode   | Apache-2.0 package; retain libwebp notices            |
 | @jsquash/avif                  | 2.1.1   | AVIF WASM encode/decode   | Apache-2.0 package; retain libavif/AOM notices        |
 | @jsquash/resize                | 2.1.1   | Image resize WASM         | Apache-2.0 package; retain bundled library notices    |
+| pdf-lib                        | 1.17.1  | PDF create/merge/split    | MIT; retain applicable notices                        |
+| pdfjs-dist                     | 5.7.284 | PDF page rendering        | Apache-2.0; retain applicable notices                 |
 | Vitest                         | 4.1.10  | Unit/integration tests    | MIT; development dependency                           |
 
 ## jSquash notice policy
 
 The jSquash repository is Apache-2.0, while bundled codecs include upstream components such as MozJPEG, libwebp, libavif/AOM, Rust PNG and resize libraries. Before a paid release, generate the complete transitive license report from the locked installation and preserve every notice required by those upstream components. Do not reduce the notice obligation to the top-level package license alone.
+
+## PDF notice policy
+
+`pdf-lib` is MIT licensed. `pdfjs-dist` is the distributed package of Mozilla PDF.js and is Apache-2.0 licensed. Production releases must preserve all license/notice files carried by the exact locked packages and any bundled worker/font assets that are shipped.
 
 ## Release rule
 
