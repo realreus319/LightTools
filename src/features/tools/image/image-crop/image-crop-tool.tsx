@@ -167,8 +167,7 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
           throw new TypeError('Unsupported validated image MIME')
         }
 
-        const selectedOutputMime =
-          outputFormat === 'same' ? validation.mimeType : outputFormat
+        const selectedOutputMime = outputFormat === 'same' ? validation.mimeType : outputFormat
         const buffer = await item.file.arrayBuffer()
         const payload: ImageProcessPayload = {
           buffer,
