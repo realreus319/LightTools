@@ -1,6 +1,11 @@
 import { ToolError } from '@/lib/errors/tool-error'
 import { calculateFitDimensions } from './image-dimensions'
-import type { ImageProcessPayload, ImageProcessResult, SupportedImageMime } from './image-types'
+import { applyImagePixelTransform } from './image-pixel-transform'
+import type {
+  ImageProcessPayload,
+  ImageProcessResult,
+  SupportedImageMime,
+} from './image-types'
 import { calculateTargetResizeScale, findHighestQualityAtTarget } from './target-size-search'
 
 const MAX_TARGET_ATTEMPTS = 18
@@ -13,11 +18,13 @@ function normalizeQuality(quality: number): number {
 }
 
 function requireEightBitImageData(
-  value: {
-    data: Uint8ClampedArray | Uint16Array
-    width: number
-    height: number
-  } | null,
+  value:
+    | {
+        data: Uint8ClampedArray | Uint16Array
+        width: number
+        height: number
+      }
+    | null,
 ): ImageData {
   if (!value) {
     throw new ToolError('DECODE_FAILED', 'Image decoder returned no pixels', { stage: 'decode' })
@@ -63,7 +70,12 @@ async function resizeExact(image: ImageData, width: number, height: number): Pro
   if (width === image.width && height === image.height) return image
   try {
     const { default: resize } = await import('@jsquash/resize')
-    return await resize(image, { width, height, method: 'lanczos3', fitMethod: 'stretch' })
+    return await resize(image, {
+      width,
+      height,
+      method: 'lanczos3',
+      fitMethod: 'stretch',
+    })
   } catch (error) {
     throw new ToolError('ENCODE_FAILED', 'Image resize failed', {
       stage: 'transform',
@@ -84,7 +96,10 @@ async function resizeImage(
   return resizeExact(image, dimensions.width, dimensions.height)
 }
 
-function flattenAlpha(image: ImageData, background: readonly [number, number, number]): ImageData {
+function flattenAlpha(
+  image: ImageData,
+  background: readonly [number, number, number],
+): ImageData {
   const output = new Uint8ClampedArray(image.data)
   const [backgroundRed, backgroundGreen, backgroundBlue] = background
 
@@ -92,8 +107,12 @@ function flattenAlpha(image: ImageData, background: readonly [number, number, nu
     const alpha = (output[index + 3] ?? 255) / 255
     if (alpha >= 1) continue
     output[index] = Math.round((output[index] ?? 0) * alpha + backgroundRed * (1 - alpha))
-    output[index + 1] = Math.round((output[index + 1] ?? 0) * alpha + backgroundGreen * (1 - alpha))
-    output[index + 2] = Math.round((output[index + 2] ?? 0) * alpha + backgroundBlue * (1 - alpha))
+    output[index + 1] = Math.round(
+      (output[index + 1] ?? 0) * alpha + backgroundGreen * (1 - alpha),
+    )
+    output[index + 2] = Math.round(
+      (output[index + 2] ?? 0) * alpha + backgroundBlue * (1 - alpha),
+    )
     output[index + 3] = 255
   }
 
@@ -178,8 +197,9 @@ async function encodeToTarget(
       }
       if (search.smallest) {
         const candidate = { buffer: search.smallest.value, quality: search.smallest.quality, image }
-        if (!fallback || candidate.buffer.byteLength < fallback.buffer.byteLength)
+        if (!fallback || candidate.buffer.byteLength < fallback.buffer.byteLength) {
           fallback = candidate
+        }
       }
     }
 
@@ -208,8 +228,10 @@ export async function processImage(payload: ImageProcessPayload): Promise<ImageP
     })
   }
 
+  image = applyImagePixelTransform(image, payload.transform)
   image = await resizeImage(image, payload.maxWidth, payload.maxHeight)
   const jpegBackground = payload.jpegBackground ?? [255, 255, 255]
+
   if (payload.targetBytes && payload.targetBytes > 0) {
     const targeted = await encodeToTarget(
       image,

@@ -5,10 +5,16 @@ import { SiteHeader } from '@/components/app-shell/site-header'
 import { ToolCard } from '@/components/tool-shell/tool-card'
 import { ToolPageShell } from '@/components/tool-shell/tool-page-shell'
 import { ImageCompressTool } from '@/features/tools/image/image-compress/image-compress-tool'
+import { ImageCropTool } from '@/features/tools/image/image-crop/image-crop-tool'
 import { ImageTransformTool } from '@/features/tools/image/image-transform/image-transform-tool'
 import { getAlternateLocale, isLocale, locales } from '@/i18n/config'
 import { getMessages, getToolCopy } from '@/i18n/messages'
-import { getRelatedTools, getToolBySlug, tools, type ToolSlug } from '@/lib/tool-registry/tools'
+import {
+  getRelatedTools,
+  getToolBySlug,
+  tools,
+  type ToolSlug,
+} from '@/lib/tool-registry/tools'
 
 export function generateStaticParams() {
   return locales.flatMap((locale) => tools.map((tool) => ({ locale, slug: tool.slug })))
@@ -36,6 +42,8 @@ export default async function ToolPage({
       <ImageTransformTool locale={locale} mode="convert" />
     ) : tool.slug === 'image-resize' ? (
       <ImageTransformTool locale={locale} mode="resize" />
+    ) : tool.slug === 'image-crop' ? (
+      <ImageCropTool locale={locale} />
     ) : tool.slug === 'image-metadata-remove' ? (
       <ImageTransformTool locale={locale} mode="metadata" />
     ) : undefined
@@ -60,6 +68,7 @@ export default async function ToolPage({
       >
         {toolContent}
       </ToolPageShell>
+
       <section className="border-t border-border/60 py-12 sm:py-16">
         <Container>
           <h2 className="text-2xl font-semibold tracking-tight">
@@ -84,6 +93,7 @@ export default async function ToolPage({
           </div>
         </Container>
       </section>
+
       <section className="border-t border-border/60 bg-background-muted/40 py-12">
         <Container>
           <h2 className="text-xl font-semibold">{messages.toolPage.privacyTitle}</h2>

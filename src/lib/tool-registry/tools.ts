@@ -59,7 +59,7 @@ const RAW_TOOLS = [
     outputKinds: ['image/*'],
     localOnly: true,
     related: ['image-resize', 'image-compress'],
-    status: 'planned',
+    status: 'beta',
   },
   {
     slug: 'image-metadata-remove',

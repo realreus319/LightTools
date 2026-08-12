@@ -1,3 +1,5 @@
+import type { ImagePixelTransform } from './image-pixel-transform'
+
 export const SUPPORTED_IMAGE_MIMES = [
   'image/jpeg',
   'image/png',
@@ -15,6 +17,7 @@ export type ImageProcessPayload = {
   maxWidth?: number
   maxHeight?: number
   targetBytes?: number
+  transform?: ImagePixelTransform
   jpegBackground?: readonly [number, number, number]
 }
 
