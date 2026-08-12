@@ -12,6 +12,7 @@ import { PdfMergeTool } from '@/features/tools/pdf/pdf-merge/pdf-merge-tool'
 import { PdfSplitTool } from '@/features/tools/pdf/pdf-split/pdf-split-tool'
 import { PdfToImageTool } from '@/features/tools/pdf/pdf-to-image/pdf-to-image-tool'
 import { CoreTextTool, isCoreTextToolSlug } from '@/features/tools/text/core-text-tool'
+import { ExtendedTextTool, isExtendedTextToolSlug } from '@/features/tools/text/extended-text-tool'
 import { getAlternateLocale, isLocale, locales } from '@/i18n/config'
 import { getMessages, getToolCopy } from '@/i18n/messages'
 import { getRelatedTools, getToolBySlug, tools, type ToolSlug } from '@/lib/tool-registry/tools'
@@ -56,6 +57,8 @@ export default async function ToolPage({
       <PdfToImageTool locale={locale} />
     ) : isCoreTextToolSlug(tool.slug) ? (
       <CoreTextTool locale={locale} slug={tool.slug} />
+    ) : isExtendedTextToolSlug(tool.slug) ? (
+      <ExtendedTextTool locale={locale} slug={tool.slug} />
     ) : undefined
 
   return (
