@@ -21,6 +21,7 @@ import { formatFileSize } from '@/lib/files/format-file-size'
 import { validateFile } from '@/lib/files/validate-file'
 import { WorkerClientPool, getRecommendedWorkerCount } from '@/lib/workers/worker-client-pool'
 import { getImageCompressCopy } from './copy'
+import { ImageComparisonPreview } from '../shared/image-comparison-preview'
 import { createImageOutputName } from '../shared/image-output-name'
 import {
   isSupportedImageMime,
@@ -41,6 +42,82 @@ type ImageStats = {
   targetReached?: boolean
 }
 
+type CompressionPresetValue = {
+  quality: number
+  outputFormat: OutputFormat
+  maxDimension: string
+  targetSizeKb: string
+}
+
+type StoredCompressionPreset = {
+  id: string
+  name: string
+  value: CompressionPresetValue
+}
+
+const PRESET_STORAGE_KEY = 'lighttools:image-compress-presets:v1'
+const MAX_CUSTOM_PRESETS = 12
+
+const BUILT_IN_PRESETS: readonly StoredCompressionPreset[] = [
+  {
+    id: 'web-balanced',
+    name: 'Web Balanced',
+    value: { quality: 80, outputFormat: 'image/webp', maxDimension: '1920', targetSizeKb: '' },
+  },
+  {
+    id: 'small-file',
+    name: 'Small File',
+    value: { quality: 68, outputFormat: 'image/webp', maxDimension: '1600', targetSizeKb: '200' },
+  },
+  {
+    id: 'keep-format',
+    name: 'Keep Format',
+    value: { quality: 85, outputFormat: 'same', maxDimension: '2048', targetSizeKb: '' },
+  },
+]
+
+function isOutputFormat(value: unknown): value is OutputFormat {
+  return value === 'same' || (typeof value === 'string' && isSupportedImageMime(value))
+}
+
+function loadCustomPresets(): StoredCompressionPreset[] {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(PRESET_STORAGE_KEY) ?? '[]')
+    if (!Array.isArray(parsed)) return []
+    return parsed.flatMap((value) => {
+      if (!value || typeof value !== 'object') return []
+      const record = value as Record<string, unknown>
+      const presetValue = record.value
+      if (!presetValue || typeof presetValue !== 'object') return []
+      const settings = presetValue as Record<string, unknown>
+      if (
+        typeof record.id !== 'string' ||
+        typeof record.name !== 'string' ||
+        typeof settings.quality !== 'number' ||
+        !isOutputFormat(settings.outputFormat) ||
+        typeof settings.maxDimension !== 'string' ||
+        typeof settings.targetSizeKb !== 'string'
+      ) {
+        return []
+      }
+      return [
+        {
+          id: record.id,
+          name: record.name.slice(0, 40),
+          value: {
+            quality: Math.max(1, Math.min(100, settings.quality)),
+            outputFormat: settings.outputFormat,
+            maxDimension: settings.maxDimension,
+            targetSizeKb: settings.targetSizeKb,
+          },
+        },
+      ]
+    })
+  } catch {
+    return []
+  }
+}
+
 function createPool(): WorkerClientPool {
   return new WorkerClientPool(
     () => new Worker(new URL('./image-compress.worker.ts', import.meta.url), { type: 'module' }),
@@ -50,6 +127,7 @@ function createPool(): WorkerClientPool {
 
 export function ImageCompressTool({ locale }: { locale: Locale }) {
   const copy = getImageCompressCopy(locale)
+  const zh = locale === 'zh-CN'
   const { items, dispatch } = useFileQueue()
   const [quality, setQuality] = useState(80)
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('same')
@@ -57,13 +135,43 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
   const [targetSizeKb, setTargetSizeKb] = useState('')
   const [batchError, setBatchError] = useState<string>()
   const [stats, setStats] = useState<Record<string, ImageStats>>({})
+  const [customPresets, setCustomPresets] = useState<StoredCompressionPreset[]>([])
+  const [presetName, setPresetName] = useState('')
   const poolRef = useRef<WorkerClientPool | undefined>(undefined)
   const controllersRef = useRef(new Map<string, AbortController>())
+
+  useEffect(() => {
+    setCustomPresets(loadCustomPresets())
+  }, [])
 
   const getPool = useCallback(() => {
     poolRef.current ??= createPool()
     return poolRef.current
   }, [])
+
+  const applyPreset = (preset: StoredCompressionPreset) => {
+    setQuality(preset.value.quality)
+    setOutputFormat(preset.value.outputFormat)
+    setMaxDimension(preset.value.maxDimension)
+    setTargetSizeKb(preset.value.targetSizeKb)
+  }
+
+  const persistPresets = (presets: StoredCompressionPreset[]) => {
+    setCustomPresets(presets)
+    localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(presets))
+  }
+
+  const saveCurrentPreset = () => {
+    const name = presetName.trim().slice(0, 40)
+    if (!name) return
+    const preset: StoredCompressionPreset = {
+      id: crypto.randomUUID(),
+      name,
+      value: { quality, outputFormat, maxDimension, targetSizeKb },
+    }
+    persistPresets([preset, ...customPresets].slice(0, MAX_CUSTOM_PRESETS))
+    setPresetName('')
+  }
 
   const processItem = useCallback(
     async (item: NewFileQueueItem | FileQueueItem) => {
@@ -160,6 +268,7 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
     () => items.filter((item) => item.status === 'success' && item.result),
     [items],
   )
+  const firstSuccess = successItems[0]
 
   const retry = (id: string) => {
     const item = items.find((candidate) => candidate.id === id)
@@ -259,6 +368,50 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
         ) : null}
       </section>
 
+      <section className="space-y-4 rounded-3xl border border-border bg-background-muted/30 p-5">
+        <div>
+          <h2 className="text-sm font-semibold">{zh ? '参数预设' : 'Parameter presets'}</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {zh
+              ? '预设只保存压缩参数到本机，不保存图片、文件名或正文。'
+              : 'Presets save processing parameters locally; images, filenames, and content are never stored.'}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {BUILT_IN_PRESETS.map((preset) => (
+            <Button key={preset.id} variant="outline" size="sm" onClick={() => applyPreset(preset)}>
+              {preset.name}
+            </Button>
+          ))}
+          {customPresets.map((preset) => (
+            <div key={preset.id} className="inline-flex items-center rounded-xl border border-border bg-background">
+              <button type="button" className="px-3 py-2 text-sm font-medium" onClick={() => applyPreset(preset)}>
+                {preset.name}
+              </button>
+              <button
+                type="button"
+                aria-label={`${zh ? '删除预设' : 'Delete preset'} ${preset.name}`}
+                className="border-s border-border px-2 py-2 text-sm text-muted-foreground hover:text-destructive"
+                onClick={() => persistPresets(customPresets.filter((item) => item.id !== preset.id))}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex max-w-xl flex-col gap-2 sm:flex-row">
+          <Input
+            value={presetName}
+            maxLength={40}
+            placeholder={zh ? '自定义预设名称' : 'Custom preset name'}
+            onChange={(event) => setPresetName(event.currentTarget.value)}
+          />
+          <Button variant="outline" disabled={!presetName.trim()} onClick={saveCurrentPreset}>
+            {zh ? '保存当前参数' : 'Save current settings'}
+          </Button>
+        </div>
+      </section>
+
       <FileDropzone
         policy={IMAGE_FILE_POLICY}
         labels={copy.dropzone}
@@ -284,6 +437,14 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
         onRetry={retry}
         onRemove={remove}
       />
+
+      {firstSuccess?.result ? (
+        <ImageComparisonPreview
+          original={firstSuccess.file}
+          result={firstSuccess.result.blob}
+          locale={locale}
+        />
+      ) : null}
 
       {successItems.length > 0 ? (
         <section className="space-y-3">
