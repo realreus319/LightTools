@@ -1,0 +1,151 @@
+name: Fix M8 preset store
+
+on:
+  push:
+    branches: [feat/commercial-v1]
+    paths:
+      - '.github/workflows/fix-m8-preset-store.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lighttools-fix-m8-preset-store
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/commercial-v1
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.11.1
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Replace effect-based localStorage sync
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('src/features/tools/image/image-compress/image-compress-tool.tsx')
+          text = path.read_text()
+
+          old_import = "import { useCallback, useEffect, useMemo, useRef, useState } from 'react'"
+          new_import = "import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'"
+          if old_import not in text:
+              raise SystemExit('React import anchor not found')
+          text = text.replace(old_import, new_import, 1)
+
+          text = text.replace(
+              "const PRESET_STORAGE_KEY = 'lighttools:image-compress-presets:v1'\nconst MAX_CUSTOM_PRESETS = 12",
+              "const PRESET_STORAGE_KEY = 'lighttools:image-compress-presets:v1'\nconst PRESET_CHANGE_EVENT = 'lighttools:image-compress-presets-change'\nconst EMPTY_PRESET_SNAPSHOT = '[]'\nconst MAX_CUSTOM_PRESETS = 12",
+              1,
+          )
+
+          replacement = r'''function getPresetSnapshot(): string {
+            return localStorage.getItem(PRESET_STORAGE_KEY) ?? EMPTY_PRESET_SNAPSHOT
+          }
+
+          function getServerPresetSnapshot(): string {
+            return EMPTY_PRESET_SNAPSHOT
+          }
+
+          function subscribeToPresets(listener: () => void): () => void {
+            const handleStorage = (event: StorageEvent) => {
+              if (event.key === PRESET_STORAGE_KEY) listener()
+            }
+            window.addEventListener('storage', handleStorage)
+            window.addEventListener(PRESET_CHANGE_EVENT, listener)
+            return () => {
+              window.removeEventListener('storage', handleStorage)
+              window.removeEventListener(PRESET_CHANGE_EVENT, listener)
+            }
+          }
+
+          function parseCustomPresets(snapshot: string): StoredCompressionPreset[] {
+            try {
+              const parsed: unknown = JSON.parse(snapshot)
+              if (!Array.isArray(parsed)) return []
+              return parsed.flatMap((value) => {
+                if (!value || typeof value !== 'object') return []
+                const record = value as Record<string, unknown>
+                const presetValue = record.value
+                if (!presetValue || typeof presetValue !== 'object') return []
+                const settings = presetValue as Record<string, unknown>
+                if (
+                  typeof record.id !== 'string' ||
+                  typeof record.name !== 'string' ||
+                  typeof settings.quality !== 'number' ||
+                  !isOutputFormat(settings.outputFormat) ||
+                  typeof settings.maxDimension !== 'string' ||
+                  typeof settings.targetSizeKb !== 'string'
+                ) {
+                  return []
+                }
+                return [
+                  {
+                    id: record.id,
+                    name: record.name.slice(0, 40),
+                    value: {
+                      quality: Math.max(1, Math.min(100, settings.quality)),
+                      outputFormat: settings.outputFormat,
+                      maxDimension: settings.maxDimension,
+                      targetSizeKb: settings.targetSizeKb,
+                    },
+                  },
+                ]
+              })
+            } catch {
+              return []
+            }
+          }
+
+          function createPool'''
+          text, count = re.subn(
+              r'function loadCustomPresets\(\): StoredCompressionPreset\[\] \{[\s\S]*?\n\}\n\nfunction createPool',
+              replacement,
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit('Preset parser block not replaced')
+
+          old_state = "  const [customPresets, setCustomPresets] = useState<StoredCompressionPreset[]>([])\n  const [presetName, setPresetName] = useState('')"
+          new_state = "  const presetSnapshot = useSyncExternalStore(\n    subscribeToPresets,\n    getPresetSnapshot,\n    getServerPresetSnapshot,\n  )\n  const customPresets = useMemo(() => parseCustomPresets(presetSnapshot), [presetSnapshot])\n  const [presetName, setPresetName] = useState('')"
+          if old_state not in text:
+              raise SystemExit('Preset state anchor not found')
+          text = text.replace(old_state, new_state, 1)
+
+          effect = "\n  useEffect(() => {\n    setCustomPresets(loadCustomPresets())\n  }, [])\n"
+          if effect not in text:
+              raise SystemExit('Preset effect anchor not found')
+          text = text.replace(effect, '\n', 1)
+
+          old_persist = "  const persistPresets = (presets: StoredCompressionPreset[]) => {\n    setCustomPresets(presets)\n    localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(presets))\n  }"
+          new_persist = "  const persistPresets = (presets: StoredCompressionPreset[]) => {\n    localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(presets))\n    window.dispatchEvent(new Event(PRESET_CHANGE_EVENT))\n  }"
+          if old_persist not in text:
+              raise SystemExit('Preset persist anchor not found')
+          text = text.replace(old_persist, new_persist, 1)
+
+          path.write_text(text)
+          PY
+      - run: pnpm exec prettier --write src/features/tools/image/image-compress/image-compress-tool.tsx src/features/tools/image/shared/image-comparison-preview.tsx
+      - name: Commit fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/features/tools/image/image-compress/image-compress-tool.tsx src/features/tools/image/shared/image-comparison-preview.tsx
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'fix: synchronize image presets safely'
+          git push origin HEAD:feat/commercial-v1
