@@ -27,7 +27,9 @@ export function ShareToolButton({ locale }: { locale: Locale }) {
           .catch(() =>
             add({
               title: zh ? '复制失败' : 'Copy failed',
-              description: zh ? '请从地址栏复制当前工具地址。' : 'Copy the tool URL from the address bar instead.',
+              description: zh
+                ? '请从地址栏复制当前工具地址。'
+                : 'Copy the tool URL from the address bar instead.',
             }),
           )
       }}

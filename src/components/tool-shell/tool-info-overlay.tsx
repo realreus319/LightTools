@@ -53,7 +53,16 @@ function InfoBody({
     <div className="space-y-5 text-sm leading-6">
       <div className="grid gap-3 sm:grid-cols-3">
         {[
-          [zh ? '数据位置' : 'Data location', localOnly ? (zh ? '浏览器本地' : 'Local browser') : zh ? '视工具而定' : 'Tool dependent'],
+          [
+            zh ? '数据位置' : 'Data location',
+            localOnly
+              ? zh
+                ? '浏览器本地'
+                : 'Local browser'
+              : zh
+                ? '视工具而定'
+                : 'Tool dependent',
+          ],
           [zh ? '版本状态' : 'Release status', statusText],
           [zh ? '分享方式' : 'Sharing', zh ? '仅工具路径' : 'Tool path only'],
         ].map(([label, value]) => (
@@ -67,9 +76,21 @@ function InfoBody({
       <div>
         <h3 className="font-semibold">{zh ? '处理链路' : 'Processing path'}</h3>
         <ol className="mt-2 list-decimal space-y-1 ps-5 text-muted-foreground">
-          <li>{zh ? '先在浏览器校验输入类型与安全边界。' : 'Validate input types and safety limits in the browser first.'}</li>
-          <li>{zh ? '重型计算优先进入 Worker / WASM，避免阻塞页面。' : 'Heavy computation runs in Worker / WASM where practical to protect UI responsiveness.'}</li>
-          <li>{zh ? '结果直接从浏览器生成下载，不把内容塞进分享 URL。' : 'Generate downloads directly from the browser without putting content into the share URL.'}</li>
+          <li>
+            {zh
+              ? '先在浏览器校验输入类型与安全边界。'
+              : 'Validate input types and safety limits in the browser first.'}
+          </li>
+          <li>
+            {zh
+              ? '重型计算优先进入 Worker / WASM，避免阻塞页面。'
+              : 'Heavy computation runs in Worker / WASM where practical to protect UI responsiveness.'}
+          </li>
+          <li>
+            {zh
+              ? '结果直接从浏览器生成下载，不把内容塞进分享 URL。'
+              : 'Generate downloads directly from the browser without putting content into the share URL.'}
+          </li>
         </ol>
       </div>
 
@@ -77,7 +98,11 @@ function InfoBody({
         <div>
           <h3 className="font-semibold">{zh ? '输入' : 'Inputs'}</h3>
           <p className="mt-1 break-words text-muted-foreground">
-            {inputKinds.length ? inputKinds.join(' · ') : zh ? '无需文件输入' : 'No file input required'}
+            {inputKinds.length
+              ? inputKinds.join(' · ')
+              : zh
+                ? '无需文件输入'
+                : 'No file input required'}
           </p>
         </div>
         <div>

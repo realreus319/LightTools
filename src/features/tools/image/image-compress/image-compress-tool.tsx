@@ -384,15 +384,24 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
             </Button>
           ))}
           {customPresets.map((preset) => (
-            <div key={preset.id} className="inline-flex items-center rounded-xl border border-border bg-background">
-              <button type="button" className="px-3 py-2 text-sm font-medium" onClick={() => applyPreset(preset)}>
+            <div
+              key={preset.id}
+              className="inline-flex items-center rounded-xl border border-border bg-background"
+            >
+              <button
+                type="button"
+                className="px-3 py-2 text-sm font-medium"
+                onClick={() => applyPreset(preset)}
+              >
                 {preset.name}
               </button>
               <button
                 type="button"
                 aria-label={`${zh ? '删除预设' : 'Delete preset'} ${preset.name}`}
                 className="border-s border-border px-2 py-2 text-sm text-muted-foreground hover:text-destructive"
-                onClick={() => persistPresets(customPresets.filter((item) => item.id !== preset.id))}
+                onClick={() =>
+                  persistPresets(customPresets.filter((item) => item.id !== preset.id))
+                }
               >
                 ×
               </button>

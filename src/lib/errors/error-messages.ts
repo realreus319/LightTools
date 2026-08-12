@@ -25,7 +25,8 @@ const MESSAGES: Record<Locale, Record<ToolErrorCode, string>> = {
   en: {
     EMPTY_FILE: 'The file is empty and cannot be processed.',
     FILE_TOO_LARGE: 'This file exceeds the size limit for the current tool.',
-    FILE_NAME_TOO_LONG: 'The filename is too long. Shorten it to 255 characters or fewer and try again.',
+    FILE_NAME_TOO_LONG:
+      'The filename is too long. Shorten it to 255 characters or fewer and try again.',
     TOO_MANY_FILES: 'Too many files were selected for this tool.',
     BATCH_TOO_LARGE: 'The selected batch is too large. Remove some files and try again.',
     UNSUPPORTED_FORMAT: 'This file format is not supported by the current tool.',

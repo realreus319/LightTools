@@ -35,7 +35,9 @@ export function CopyButton({
           .catch(() =>
             add({
               title: zh ? '复制失败' : 'Copy failed',
-              description: zh ? '浏览器未允许访问剪贴板。' : 'The browser did not allow clipboard access.',
+              description: zh
+                ? '浏览器未允许访问剪贴板。'
+                : 'The browser did not allow clipboard access.',
             }),
           )
       }}
