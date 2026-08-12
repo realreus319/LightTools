@@ -58,7 +58,6 @@ export async function renderPdfToImages(
     const pdfjs = await import('pdfjs-dist/webpack.mjs')
     const loadingTask = pdfjs.getDocument({
       data: new Uint8Array(buffer),
-      isEvalSupported: false,
       stopAtErrors: true,
       useWasm: false,
       maxImageSize: 80_000_000,
@@ -96,7 +95,7 @@ export async function renderPdfToImages(
           context.fillRect(0, 0, width, height)
         }
 
-        await page.render({ canvasContext: context, viewport }).promise
+        await page.render({ canvas, canvasContext: context, viewport }).promise
         const blob = await canvasToBlob(canvas, options.format, options.quality)
         pages.push({ pageNumber, blob, width, height })
         page.cleanup()
