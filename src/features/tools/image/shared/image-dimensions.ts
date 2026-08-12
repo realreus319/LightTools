@@ -20,3 +20,24 @@ export function calculateFitDimensions(
     height: Math.max(1, Math.round(source.height * scale)),
   }
 }
+
+export function calculateScaleDimensions(
+  source: ImageDimensions,
+  percent: number,
+  allowUpscale = false,
+): ImageDimensions {
+  if (source.width < 1 || source.height < 1) {
+    throw new RangeError('Source dimensions must be positive')
+  }
+  if (!Number.isFinite(percent) || percent <= 0) {
+    throw new RangeError('Scale percent must be positive')
+  }
+
+  const normalizedPercent = allowUpscale ? percent : Math.min(percent, 100)
+  const scale = normalizedPercent / 100
+
+  return {
+    width: Math.max(1, Math.round(source.width * scale)),
+    height: Math.max(1, Math.round(source.height * scale)),
+  }
+}

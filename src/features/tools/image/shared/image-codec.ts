@@ -1,7 +1,11 @@
 import { ToolError } from '@/lib/errors/tool-error'
-import { calculateFitDimensions } from './image-dimensions'
+import { calculateFitDimensions, calculateScaleDimensions } from './image-dimensions'
 import { applyImagePixelTransform } from './image-pixel-transform'
-import type { ImageProcessPayload, ImageProcessResult, SupportedImageMime } from './image-types'
+import type {
+  ImageProcessPayload,
+  ImageProcessResult,
+  SupportedImageMime,
+} from './image-types'
 import { calculateTargetResizeScale, findHighestQualityAtTarget } from './target-size-search'
 
 const MAX_TARGET_ATTEMPTS = 18
@@ -14,11 +18,13 @@ function normalizeQuality(quality: number): number {
 }
 
 function requireEightBitImageData(
-  value: {
-    data: Uint8ClampedArray | Uint16Array
-    width: number
-    height: number
-  } | null,
+  value:
+    | {
+        data: Uint8ClampedArray | Uint16Array
+        width: number
+        height: number
+      }
+    | null,
 ): ImageData {
   if (!value) {
     throw new ToolError('DECODE_FAILED', 'Image decoder returned no pixels', { stage: 'decode' })
@@ -90,7 +96,16 @@ async function resizeImage(
   return resizeExact(image, dimensions.width, dimensions.height)
 }
 
-function flattenAlpha(image: ImageData, background: readonly [number, number, number]): ImageData {
+async function scaleImage(image: ImageData, percent?: number): Promise<ImageData> {
+  if (!percent || percent === 100) return image
+  const dimensions = calculateScaleDimensions({ width: image.width, height: image.height }, percent)
+  return resizeExact(image, dimensions.width, dimensions.height)
+}
+
+function flattenAlpha(
+  image: ImageData,
+  background: readonly [number, number, number],
+): ImageData {
   const output = new Uint8ClampedArray(image.data)
   const [backgroundRed, backgroundGreen, backgroundBlue] = background
 
@@ -98,8 +113,12 @@ function flattenAlpha(image: ImageData, background: readonly [number, number, nu
     const alpha = (output[index + 3] ?? 255) / 255
     if (alpha >= 1) continue
     output[index] = Math.round((output[index] ?? 0) * alpha + backgroundRed * (1 - alpha))
-    output[index + 1] = Math.round((output[index + 1] ?? 0) * alpha + backgroundGreen * (1 - alpha))
-    output[index + 2] = Math.round((output[index + 2] ?? 0) * alpha + backgroundBlue * (1 - alpha))
+    output[index + 1] = Math.round(
+      (output[index + 1] ?? 0) * alpha + backgroundGreen * (1 - alpha),
+    )
+    output[index + 2] = Math.round(
+      (output[index + 2] ?? 0) * alpha + backgroundBlue * (1 - alpha),
+    )
     output[index + 3] = 255
   }
 
@@ -216,6 +235,7 @@ export async function processImage(payload: ImageProcessPayload): Promise<ImageP
   }
 
   image = applyImagePixelTransform(image, payload.transform)
+  image = await scaleImage(image, payload.scalePercent)
   image = await resizeImage(image, payload.maxWidth, payload.maxHeight)
   const jpegBackground = payload.jpegBackground ?? [255, 255, 255]
 

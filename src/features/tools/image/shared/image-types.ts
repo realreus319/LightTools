@@ -16,6 +16,7 @@ export type ImageProcessPayload = {
   quality: number
   maxWidth?: number
   maxHeight?: number
+  scalePercent?: number
   targetBytes?: number
   transform?: ImagePixelTransform
   jpegBackground?: readonly [number, number, number]
