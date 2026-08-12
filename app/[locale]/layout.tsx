@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { ThemeProvider } from '@appica/ui-react/providers/theme-provider'
+import { AppProviders } from '@/components/app-shell/app-providers'
 import { isLocale, locales } from '@/i18n/config'
 import { getMessages } from '@/i18n/messages'
 import { getSiteUrl } from '@/lib/seo/site-url'
@@ -62,7 +62,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   )

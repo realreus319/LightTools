@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { Badge } from '@appica/ui-react/badge'
 import { Container } from '@/components/app-shell/container'
+import { ToolInfoOverlay } from '@/components/tool-shell/tool-info-overlay'
+import { ShareToolButton } from '@/components/tool-shell/share-tool-button'
 import type { Locale } from '@/i18n/config'
 import type { Messages } from '@/i18n/messages'
 import type { ToolDefinition } from '@/lib/tool-registry/schema'
@@ -48,14 +50,28 @@ export function ToolPageShell({
               {tool.localOnly ? <Badge variant="soft">{messages.toolPage.localBadge}</Badge> : null}
               {tool.status === 'planned' ? (
                 <Badge variant="soft">{messages.toolCard.planned}</Badge>
-              ) : null}
+              ) : tool.status === 'beta' ? (
+                <Badge variant="soft">{messages.toolCard.beta}</Badge>
+              ) : (
+                <Badge variant="soft">{messages.toolCard.stable}</Badge>
+              )}
             </div>
             <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-5xl">{title}</h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
               {description}
             </p>
           </div>
-          <ToolPreferenceControls slug={slug} labels={messages.preferences} />
+          <div className="flex flex-wrap gap-2">
+            <ToolPreferenceControls slug={slug} labels={messages.preferences} />
+            <ToolInfoOverlay
+              locale={locale}
+              localOnly={tool.localOnly}
+              status={tool.status}
+              inputKinds={tool.inputKinds}
+              outputKinds={tool.outputKinds}
+            />
+            <ShareToolButton locale={locale} />
+          </div>
         </div>
 
         <div className="mt-10">
