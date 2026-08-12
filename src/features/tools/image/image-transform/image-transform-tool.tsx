@@ -35,7 +35,8 @@ type ImageTransformToolProps = {
   mode: ImageTransformMode
 }
 
-type ResizePreset = 'custom' | 'original' | 'half' | 'quarter' | 'full-hd' | 'square' | 'social' | 'portrait'
+type ResizePreset =
+  'custom' | 'original' | 'half' | 'quarter' | 'full-hd' | 'square' | 'social' | 'portrait'
 
 type ResultStats = {
   width: number
@@ -270,7 +271,9 @@ export function ImageTransformTool({ locale, mode }: ImageTransformToolProps) {
                 <span>{copy.outputFormat}</span>
                 <select
                   value={outputMime}
-                  onChange={(event) => setOutputMime(event.currentTarget.value as SupportedImageMime)}
+                  onChange={(event) =>
+                    setOutputMime(event.currentTarget.value as SupportedImageMime)
+                  }
                   className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
                 >
                   <option value="image/jpeg">JPEG</option>

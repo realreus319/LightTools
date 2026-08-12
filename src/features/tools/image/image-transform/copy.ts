@@ -48,7 +48,9 @@ export function getImageTransformCopy(locale: Locale, mode: ImageTransformMode) 
     percentage: zh ? '缩放比例 %' : 'Scale percent',
     width: zh ? '最大宽度' : 'Maximum width',
     height: zh ? '最大高度' : 'Maximum height',
-    noUpscale: zh ? '默认保持宽高比且不会放大原图。' : 'Aspect ratio is preserved and images are not enlarged by default.',
+    noUpscale: zh
+      ? '默认保持宽高比且不会放大原图。'
+      : 'Aspect ratio is preserved and images are not enlarged by default.',
     dimensions: zh ? '最终尺寸' : 'Final dimensions',
     download: zh ? '下载' : 'Download',
     downloadAll: zh ? '下载全部 ZIP' : 'Download all as ZIP',
