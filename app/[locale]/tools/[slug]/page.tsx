@@ -7,9 +7,16 @@ import { ToolPageShell } from '@/components/tool-shell/tool-page-shell'
 import { ImageCompressTool } from '@/features/tools/image/image-compress/image-compress-tool'
 import { ImageCropTool } from '@/features/tools/image/image-crop/image-crop-tool'
 import { ImageTransformTool } from '@/features/tools/image/image-transform/image-transform-tool'
+import { PdfMergeTool } from '@/features/tools/pdf/pdf-merge/pdf-merge-tool'
+import { PdfSplitTool } from '@/features/tools/pdf/pdf-split/pdf-split-tool'
 import { getAlternateLocale, isLocale, locales } from '@/i18n/config'
 import { getMessages, getToolCopy } from '@/i18n/messages'
-import { getRelatedTools, getToolBySlug, tools, type ToolSlug } from '@/lib/tool-registry/tools'
+import {
+  getRelatedTools,
+  getToolBySlug,
+  tools,
+  type ToolSlug,
+} from '@/lib/tool-registry/tools'
 
 export function generateStaticParams() {
   return locales.flatMap((locale) => tools.map((tool) => ({ locale, slug: tool.slug })))
@@ -41,6 +48,10 @@ export default async function ToolPage({
       <ImageCropTool locale={locale} />
     ) : tool.slug === 'image-metadata-remove' ? (
       <ImageTransformTool locale={locale} mode="metadata" />
+    ) : tool.slug === 'pdf-merge' ? (
+      <PdfMergeTool locale={locale} />
+    ) : tool.slug === 'pdf-split' ? (
+      <PdfSplitTool locale={locale} />
     ) : undefined
 
   return (
