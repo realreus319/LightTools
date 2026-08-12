@@ -20,7 +20,7 @@ export function QrTool({ locale }: { locale: Locale }) {
   const [previewUrl, setPreviewUrl] = useState<string>()
   const [svg, setSvg] = useState<string>()
   const [error, setError] = useState<string>()
-  const currentUrlRef = useRef<string>()
+  const currentUrlRef = useRef<string | undefined>(undefined)
 
   useEffect(
     () => () => {
