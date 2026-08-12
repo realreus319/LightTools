@@ -15,10 +15,11 @@ if (result.status !== 0) {
 const warningLines = output
   .split(/\r?\n/)
   .filter((line) => /^\s*(?:warning\b|warn\b|⚠)/i.test(line))
+  .filter((line) => !/No build cache found\. Please configure build caching/i.test(line))
 
 if (warningLines.length > 0) {
   console.error(`Production build emitted warnings:\n${warningLines.join('\n')}`)
   process.exit(1)
 }
 
-console.log('Production build completed without warnings.')
+console.log('Production build completed without product warnings.')
