@@ -4,17 +4,24 @@ import { DeveloperDataTool } from './developer-data-tools'
 import { EncodingTool } from './encoding-tools'
 import { RegexTool } from './regex/regex-tool'
 
-export type CoreTextToolSlug =
-  | 'json-format'
-  | 'base64'
-  | 'url-codec'
-  | 'text-stats'
-  | 'text-clean'
-  | 'uuid'
-  | 'timestamp'
-  | 'hash'
-  | 'jwt-decode'
-  | 'regex'
+export const CORE_TEXT_TOOL_SLUGS = [
+  'json-format',
+  'base64',
+  'url-codec',
+  'text-stats',
+  'text-clean',
+  'uuid',
+  'timestamp',
+  'hash',
+  'jwt-decode',
+  'regex',
+] as const
+
+export type CoreTextToolSlug = (typeof CORE_TEXT_TOOL_SLUGS)[number]
+
+export function isCoreTextToolSlug(value: string): value is CoreTextToolSlug {
+  return CORE_TEXT_TOOL_SLUGS.some((slug) => slug === value)
+}
 
 export function CoreTextTool({ locale, slug }: { locale: Locale; slug: CoreTextToolSlug }) {
   if (slug === 'json-format' || slug === 'url-codec' || slug === 'text-stats' || slug === 'text-clean') {
