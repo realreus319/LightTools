@@ -1,8 +1,7 @@
 type RegexWorkerRequest = { pattern: string; flags: string; text: string }
 type RegexWorkerMatch = { value: string; index: number; groups: readonly string[] }
 type RegexWorkerResponse =
-  | { ok: true; matches: RegexWorkerMatch[] }
-  | { ok: false; message: string }
+  { ok: true; matches: RegexWorkerMatch[] } | { ok: false; message: string }
 
 self.onmessage = (event: MessageEvent<RegexWorkerRequest>) => {
   try {
