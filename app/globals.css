@@ -1,0 +1,73 @@
+@import 'tailwindcss';
+@import '@appica/ui-react/styles.css';
+
+@source '../node_modules/@appica/ui-react/dist';
+
+:root {
+  --lt-content: 72rem;
+  --lt-brand: oklch(0.6 0.2 260);
+  --lt-brand-strong: oklch(0.5 0.22 260);
+  --lt-surface: var(--background);
+  --lt-surface-muted: var(--background-muted);
+  --lt-text: var(--foreground);
+  --lt-text-muted: var(--foreground-muted);
+  --lt-border: var(--border);
+  --lt-radius-card: 1.25rem;
+  --lt-radius-control: 0.75rem;
+  --lt-shadow-card: 0 16px 48px color-mix(in oklab, var(--foreground) 7%, transparent);
+  --lt-font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--lt-surface);
+  color: var(--lt-text);
+  font-family: var(--lt-font-sans);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--lt-brand) 24%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--lt-brand);
+  outline-offset: 3px;
+}
+
+.lt-card-shadow {
+  box-shadow: var(--lt-shadow-card);
+}
+
+.lt-skip-link {
+  position: fixed;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: var(--lt-radius-control);
+  background: var(--foreground);
+  color: var(--background);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.lt-skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
