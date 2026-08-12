@@ -1,6 +1,11 @@
 'use client'
 
-export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function GlobalError({
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
   return (
     <html lang="en">
       <body>
@@ -32,8 +37,8 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
             </div>
             <h1 style={{ marginTop: 24, fontSize: 32 }}>LightTools could not load</h1>
             <p style={{ marginTop: 12, lineHeight: 1.7, color: '#64748b' }}>
-              A global application error occurred. Refreshing this boundary will not upload your local
-              files. 应用发生全局错误，重试不会上传你的本地文件。
+              A global application error occurred. Refreshing this boundary will not upload your
+              local files. 应用发生全局错误，重试不会上传你的本地文件。
             </p>
             <button
               type="button"

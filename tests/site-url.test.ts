@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import {
-  absoluteUrl,
-  getSiteUrl,
-  validateProductionSiteUrl,
-} from '../src/lib/seo/site-url'
+import { absoluteUrl, getSiteUrl, validateProductionSiteUrl } from '../src/lib/seo/site-url'
 
 const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL
 

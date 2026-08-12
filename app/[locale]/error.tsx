@@ -22,8 +22,8 @@ export default function ErrorPage({
         <div className="max-w-xl rounded-3xl border border-border bg-background p-7 sm:p-10">
           <h1 className="text-2xl font-semibold tracking-tight">Something went wrong / 出现错误</h1>
           <p className="mt-4 leading-7 text-muted-foreground">
-            The current tool could not finish this page. Your local file contents are not included in
-            the error report. 当前页面未能完成加载，错误上报不会包含你的本地文件内容。
+            The current tool could not finish this page. Your local file contents are not included
+            in the error report. 当前页面未能完成加载，错误上报不会包含你的本地文件内容。
           </p>
           {error.digest ? (
             <p className="mt-3 text-xs text-muted-foreground">Reference: {error.digest}</p>
