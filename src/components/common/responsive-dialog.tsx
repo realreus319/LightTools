@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 import { Button } from '@appica/ui-react/button'
 import {
   Dialog,
@@ -53,7 +53,7 @@ export function ResponsiveDialog({
   children,
 }: ResponsiveDialogProps) {
   const isDesktop = useSyncExternalStore(
-    useCallback(subscribeToDesktop, []),
+    subscribeToDesktop,
     getDesktopSnapshot,
     getServerDesktopSnapshot,
   )
