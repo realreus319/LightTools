@@ -4,6 +4,23 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 
+type PreviewUrls = {
+  original: string
+  result: string
+}
+
+function readBlobAsDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') resolve(reader.result)
+      else reject(new Error('Preview reader did not return a data URL'))
+    }
+    reader.onerror = () => reject(reader.error ?? new Error('Preview reader failed'))
+    reader.readAsDataURL(blob)
+  })
+}
+
 export function ImageComparisonPreview({
   original,
   result,
@@ -13,17 +30,21 @@ export function ImageComparisonPreview({
   result: Blob
   locale: Locale
 }) {
-  const [urls, setUrls] = useState<{ original: string; result: string }>()
+  const [urls, setUrls] = useState<PreviewUrls>()
   const zh = locale === 'zh-CN'
 
   useEffect(() => {
-    const originalUrl = URL.createObjectURL(original)
-    const resultUrl = URL.createObjectURL(result)
-    setUrls({ original: originalUrl, result: resultUrl })
-
+    let cancelled = false
+    void Promise.all([readBlobAsDataUrl(original), readBlobAsDataUrl(result)]).then(
+      ([originalUrl, resultUrl]) => {
+        if (!cancelled) setUrls({ original: originalUrl, result: resultUrl })
+      },
+      () => {
+        if (!cancelled) setUrls(undefined)
+      },
+    )
     return () => {
-      URL.revokeObjectURL(originalUrl)
-      URL.revokeObjectURL(resultUrl)
+      cancelled = true
     }
   }, [original, result])
 
