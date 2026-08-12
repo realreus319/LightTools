@@ -1,0 +1,73 @@
+name: Browser compatibility
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'feat/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-compat-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_PUBLIC_SITE_URL: 'https://lighttools.example'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.11.1
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps firefox webkit
+      - run: pnpm exec playwright test --config=playwright.compat.config.ts
+
+  native-safari:
+    runs-on: macos-15
+    timeout-minutes: 35
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_PUBLIC_SITE_URL: 'https://lighttools.example'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.11.1
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Start LightTools
+        run: |
+          pnpm start > /tmp/lighttools.log 2>&1 &
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/en > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/lighttools.log
+          exit 1
+      - name: Enable and start SafariDriver
+        run: |
+          sudo safaridriver --enable
+          safaridriver -p 4444 > /tmp/safaridriver.log 2>&1 &
+          sleep 2
+      - name: Native Safari smoke
+        run: node scripts/safari-smoke.mjs

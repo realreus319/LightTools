@@ -4,15 +4,7 @@ import { SiteFooter } from '@/components/app-shell/site-footer'
 import { SiteHeader } from '@/components/app-shell/site-header'
 import { ToolCard } from '@/components/tool-shell/tool-card'
 import { ToolPageShell } from '@/components/tool-shell/tool-page-shell'
-import { ImageCompressTool } from '@/features/tools/image/image-compress/image-compress-tool'
-import { ImageCropTool } from '@/features/tools/image/image-crop/image-crop-tool'
-import { ImageTransformTool } from '@/features/tools/image/image-transform/image-transform-tool'
-import { ImageToPdfTool } from '@/features/tools/pdf/image-to-pdf/image-to-pdf-tool'
-import { PdfMergeTool } from '@/features/tools/pdf/pdf-merge/pdf-merge-tool'
-import { PdfSplitTool } from '@/features/tools/pdf/pdf-split/pdf-split-tool'
-import { PdfToImageTool } from '@/features/tools/pdf/pdf-to-image/pdf-to-image-tool'
-import { CoreTextTool, isCoreTextToolSlug } from '@/features/tools/text/core-text-tool'
-import { ExtendedTextTool, isExtendedTextToolSlug } from '@/features/tools/text/extended-text-tool'
+import { ToolRenderer } from '@/features/tools/tool-renderer'
 import { getAlternateLocale, isLocale, locales } from '@/i18n/config'
 import { getMessages, getToolCopy } from '@/i18n/messages'
 import { getRelatedTools, getToolBySlug, tools, type ToolSlug } from '@/lib/tool-registry/tools'
@@ -32,34 +24,11 @@ export default async function ToolPage({
   if (!tool) notFound()
 
   const locale = rawLocale
+  const toolSlug = tool.slug as ToolSlug
   const messages = getMessages(locale)
-  const copy = getToolCopy(locale, tool.slug as ToolSlug)
+  const copy = getToolCopy(locale, toolSlug)
   const alternateLocale = getAlternateLocale(locale)
   const related = getRelatedTools(tool)
-  const toolContent =
-    tool.slug === 'image-compress' ? (
-      <ImageCompressTool locale={locale} />
-    ) : tool.slug === 'image-convert' ? (
-      <ImageTransformTool locale={locale} mode="convert" />
-    ) : tool.slug === 'image-resize' ? (
-      <ImageTransformTool locale={locale} mode="resize" />
-    ) : tool.slug === 'image-crop' ? (
-      <ImageCropTool locale={locale} />
-    ) : tool.slug === 'image-metadata-remove' ? (
-      <ImageTransformTool locale={locale} mode="metadata" />
-    ) : tool.slug === 'pdf-merge' ? (
-      <PdfMergeTool locale={locale} />
-    ) : tool.slug === 'pdf-split' ? (
-      <PdfSplitTool locale={locale} />
-    ) : tool.slug === 'image-to-pdf' ? (
-      <ImageToPdfTool locale={locale} />
-    ) : tool.slug === 'pdf-to-image' ? (
-      <PdfToImageTool locale={locale} />
-    ) : isCoreTextToolSlug(tool.slug) ? (
-      <CoreTextTool locale={locale} slug={tool.slug} />
-    ) : isExtendedTextToolSlug(tool.slug) ? (
-      <ExtendedTextTool locale={locale} slug={tool.slug} />
-    ) : undefined
 
   return (
     <>
@@ -75,11 +44,11 @@ export default async function ToolPage({
         locale={locale}
         messages={messages}
         tool={tool}
-        slug={tool.slug as ToolSlug}
+        slug={toolSlug}
         title={copy.title}
         description={copy.description}
       >
-        {toolContent}
+        <ToolRenderer locale={locale} slug={toolSlug} />
       </ToolPageShell>
 
       <section className="border-t border-border/60 py-12 sm:py-16">
