@@ -1,6 +1,7 @@
 export type ToolErrorCode =
   | 'EMPTY_FILE'
   | 'FILE_TOO_LARGE'
+  | 'FILE_NAME_TOO_LONG'
   | 'TOO_MANY_FILES'
   | 'BATCH_TOO_LARGE'
   | 'UNSUPPORTED_FORMAT'

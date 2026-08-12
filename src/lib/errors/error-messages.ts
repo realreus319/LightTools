@@ -5,6 +5,7 @@ const MESSAGES: Record<Locale, Record<ToolErrorCode, string>> = {
   'zh-CN': {
     EMPTY_FILE: '文件为空，无法处理。',
     FILE_TOO_LARGE: '这个文件超过当前工具允许的大小。',
+    FILE_NAME_TOO_LONG: '文件名过长。请将文件名缩短到 255 个字符以内后重试。',
     TOO_MANY_FILES: '选择的文件数量超过当前工具限制。',
     BATCH_TOO_LARGE: '这批文件的总体积过大，请减少文件后重试。',
     UNSUPPORTED_FORMAT: '当前工具不支持这种文件格式。',
@@ -24,6 +25,7 @@ const MESSAGES: Record<Locale, Record<ToolErrorCode, string>> = {
   en: {
     EMPTY_FILE: 'The file is empty and cannot be processed.',
     FILE_TOO_LARGE: 'This file exceeds the size limit for the current tool.',
+    FILE_NAME_TOO_LONG: 'The filename is too long. Shorten it to 255 characters or fewer and try again.',
     TOO_MANY_FILES: 'Too many files were selected for this tool.',
     BATCH_TOO_LARGE: 'The selected batch is too large. Remove some files and try again.',
     UNSUPPORTED_FORMAT: 'This file format is not supported by the current tool.',

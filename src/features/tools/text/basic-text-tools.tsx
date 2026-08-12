@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { Button } from '@appica/ui-react/button'
+import { CopyButton } from '@/components/common/copy-button'
 import type { Locale } from '@/i18n/config'
 import {
   cleanTextLines,
@@ -35,7 +36,6 @@ function copy(locale: Locale) {
     words: zh ? '词数' : 'Words',
     lines: zh ? '行数' : 'Lines',
     bytes: zh ? 'UTF-8 字节' : 'UTF-8 bytes',
-    copy: zh ? '复制结果' : 'Copy result',
     error: zh ? '处理失败' : 'Processing failed',
   }
 }
@@ -192,15 +192,7 @@ export function BasicTextTool({ locale, mode }: { locale: Locale; mode: BasicMod
         </div>
       )}
 
-      {output ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => void navigator.clipboard.writeText(output)}
-        >
-          {labels.copy}
-        </Button>
-      ) : null}
+      {output ? <CopyButton text={output} locale={locale} /> : null}
       {message ? (
         <p role="status" className="text-sm text-muted-foreground">
           {message}

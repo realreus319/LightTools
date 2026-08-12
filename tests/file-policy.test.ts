@@ -24,6 +24,15 @@ describe('file validation', () => {
     })
   })
 
+  it('rejects extreme filenames before processing content', async () => {
+    const file = new File([jpegBytes()], `${'a'.repeat(252)}.jpg`, {
+      type: 'image/jpeg',
+    }) as unknown as globalThis.File
+    await expect(validateFile(file, IMAGE_FILE_POLICY)).rejects.toMatchObject({
+      code: 'FILE_NAME_TOO_LONG',
+    })
+  })
+
   it('enforces batch file count', () => {
     const files = Array.from(
       { length: IMAGE_FILE_POLICY.maxFiles + 1 },

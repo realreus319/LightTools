@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@appica/ui-react/button'
 import { Input } from '@appica/ui-react/input'
+import { CopyButton } from '@/components/common/copy-button'
 import type { Locale } from '@/i18n/config'
 import { decodeJwt, generateUuids, parseTimestamp } from './shared/text-utils'
 
@@ -105,15 +106,7 @@ export function DeveloperDataTool({ locale, mode }: { locale: Locale; mode: Deve
           />
         </label>
       ) : null}
-      {output ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => void navigator.clipboard.writeText(output)}
-        >
-          {zh ? '复制结果' : 'Copy result'}
-        </Button>
-      ) : null}
+      {output ? <CopyButton text={output} locale={locale} /> : null}
       {error ? (
         <p role="alert" className="text-sm text-destructive">
           {error}

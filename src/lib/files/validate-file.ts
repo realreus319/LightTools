@@ -3,11 +3,18 @@ import type { FilePolicy } from './file-policy'
 import { matchesAcceptedMime } from './file-policy'
 import { isExtensionCompatible, readFileSignature, sniffMimeType } from './file-signature'
 
+const MAX_FILE_NAME_CHARACTERS = 255
+
 export type FileValidationResult = {
   mimeType: string
 }
 
 export async function validateFile(file: File, policy: FilePolicy): Promise<FileValidationResult> {
+  if (Array.from(file.name).length > MAX_FILE_NAME_CHARACTERS) {
+    throw new ToolError('FILE_NAME_TOO_LONG', 'File name exceeds application safety limit', {
+      stage: 'validation',
+    })
+  }
   if (file.size === 0) {
     throw new ToolError('EMPTY_FILE', 'File is empty', { stage: 'validation' })
   }
