@@ -58,7 +58,11 @@ export function ResponsiveDialog({
     getServerDesktopSnapshot,
   )
 
-  const trigger = <Button variant="outline" size="sm">{triggerLabel}</Button>
+  const trigger = (
+    <Button variant="outline" size="sm">
+      {triggerLabel}
+    </Button>
+  )
 
   if (isDesktop) {
     return (
@@ -85,9 +89,7 @@ export function ResponsiveDialog({
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <DrawerBody className="pb-6 text-sm leading-6 text-muted-foreground">
-          {children}
-        </DrawerBody>
+        <DrawerBody className="pb-6 text-sm leading-6 text-muted-foreground">{children}</DrawerBody>
       </DrawerContent>
     </Drawer>
   )

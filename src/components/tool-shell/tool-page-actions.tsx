@@ -29,7 +29,10 @@ export function ToolPageActions({ locale }: { locale: Locale }) {
         <ul className="grid gap-3">
           {copy.privacyPoints.map((point) => (
             <li key={point} className="flex gap-3">
-              <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-[var(--lt-brand)]" />
+              <span
+                aria-hidden="true"
+                className="mt-2 size-1.5 shrink-0 rounded-full bg-[var(--lt-brand)]"
+              />
               <span>{point}</span>
             </li>
           ))}

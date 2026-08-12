@@ -8,13 +8,7 @@ export function ResultCopyButton({ locale, value }: { locale: Locale; value: str
   const copy = getCommonActionCopy(locale)
 
   return (
-    <CopyButton
-      value={value}
-      variant="ghost"
-      size="sm"
-      label={copy.copy}
-      copiedLabel={copy.copied}
-    >
+    <CopyButton value={value} variant="ghost" size="sm" label={copy.copy} copiedLabel={copy.copied}>
       {copy.copy}
     </CopyButton>
   )
