@@ -35,7 +35,8 @@ const MESSAGES: Record<Locale, Record<ToolErrorCode, string>> = {
       'The target size cannot be reached within the available quality and dimension range.',
     PDF_ENCRYPTED: 'This PDF is password or permission protected and cannot be processed.',
     PDF_INVALID: 'The PDF could not be read and may be damaged.',
-    REGEX_TIMEOUT: 'The regular expression took too long and was terminated. Simplify it or shorten the test text.',
+    REGEX_TIMEOUT:
+      'The regular expression took too long and was terminated. Simplify it or shorten the test text.',
     WORKER_CRASHED: 'The local processing worker stopped unexpectedly. Please retry.',
     TASK_CANCELLED: 'The task was cancelled.',
     ZIP_FAILED: 'The batch could not be archived. Retry or download files individually.',

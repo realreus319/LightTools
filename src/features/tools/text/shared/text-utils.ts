@@ -114,7 +114,10 @@ export function decodeTextBase64(input: string): string {
 }
 
 function decodeBase64Url(input: string): string {
-  const padded = input.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(input.length / 4) * 4, '=')
+  const padded = input
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
+    .padEnd(Math.ceil(input.length / 4) * 4, '=')
   return decodeTextBase64(padded)
 }
 

@@ -1,9 +1,7 @@
 type Request = { pattern: string; flags: string; text: string }
 type Match = { value: string; index: number; groups: readonly string[] }
 
-type Response =
-  | { ok: true; matches: Match[] }
-  | { ok: false; message: string }
+type Response = { ok: true; matches: Match[] } | { ok: false; message: string }
 
 self.onmessage = (event: MessageEvent<Request>) => {
   try {
@@ -21,6 +19,9 @@ self.onmessage = (event: MessageEvent<Request>) => {
     }
     self.postMessage({ ok: true, matches } satisfies Response)
   } catch (error) {
-    self.postMessage({ ok: false, message: error instanceof Error ? error.message : String(error) } satisfies Response)
+    self.postMessage({
+      ok: false,
+      message: error instanceof Error ? error.message : String(error),
+    } satisfies Response)
   }
 }

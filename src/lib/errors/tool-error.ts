@@ -18,13 +18,7 @@ export type ToolErrorCode =
   | 'UNKNOWN_ERROR'
 
 export type ToolStage =
-  | 'validation'
-  | 'decode'
-  | 'transform'
-  | 'encode'
-  | 'archive'
-  | 'worker'
-  | 'download'
+  'validation' | 'decode' | 'transform' | 'encode' | 'archive' | 'worker' | 'download'
 
 export class ToolError extends Error {
   readonly code: ToolErrorCode

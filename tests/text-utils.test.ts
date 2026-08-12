@@ -24,7 +24,14 @@ describe('text helpers', () => {
   })
 
   it('cleans lists deterministically', () => {
-    expect(cleanTextLines(' b \n\na\na\n', { trim: true, removeEmpty: true, deduplicate: true, sort: true })).toBe('a\nb')
+    expect(
+      cleanTextLines(' b \n\na\na\n', {
+        trim: true,
+        removeEmpty: true,
+        deduplicate: true,
+        sort: true,
+      }),
+    ).toBe('a\nb')
   })
 
   it('counts UTF-8 bytes and lines', () => {

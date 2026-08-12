@@ -72,23 +72,91 @@ export function QrTool({ locale }: { locale: Locale }) {
       <section className="space-y-4">
         <label className="grid gap-2 text-sm font-medium">
           <span>{zh ? '二维码内容' : 'QR content'}</span>
-          <textarea value={value} onChange={(event) => setValue(event.currentTarget.value)} className="min-h-40 rounded-2xl border border-border bg-background p-4" />
+          <textarea
+            value={value}
+            onChange={(event) => setValue(event.currentTarget.value)}
+            className="min-h-40 rounded-2xl border border-border bg-background p-4"
+          />
         </label>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-2 text-sm font-medium"><span>{zh ? '纠错等级' : 'Error correction'}</span><select value={level} onChange={(event) => setLevel(event.currentTarget.value as ErrorLevel)} className="h-10 rounded-xl border border-border bg-background px-3"><option value="L">L</option><option value="M">M</option><option value="Q">Q</option><option value="H">H</option></select></label>
-          <label className="grid gap-2 text-sm font-medium"><span>{zh ? '尺寸 px' : 'Size px'}</span><Input type="number" min="128" max="2048" value={size} onChange={(event) => setSize(event.currentTarget.value)} /></label>
-          <label className="grid gap-2 text-sm font-medium"><span>{zh ? '前景色' : 'Foreground'}</span><input type="color" value={dark} onChange={(event) => setDark(event.currentTarget.value)} className="h-10 w-full rounded-xl border border-border p-1" /></label>
-          <label className="grid gap-2 text-sm font-medium"><span>{zh ? '背景色' : 'Background'}</span><input type="color" value={light} onChange={(event) => setLight(event.currentTarget.value)} className="h-10 w-full rounded-xl border border-border p-1" /></label>
+          <label className="grid gap-2 text-sm font-medium">
+            <span>{zh ? '纠错等级' : 'Error correction'}</span>
+            <select
+              value={level}
+              onChange={(event) => setLevel(event.currentTarget.value as ErrorLevel)}
+              className="h-10 rounded-xl border border-border bg-background px-3"
+            >
+              <option value="L">L</option>
+              <option value="M">M</option>
+              <option value="Q">Q</option>
+              <option value="H">H</option>
+            </select>
+          </label>
+          <label className="grid gap-2 text-sm font-medium">
+            <span>{zh ? '尺寸 px' : 'Size px'}</span>
+            <Input
+              type="number"
+              min="128"
+              max="2048"
+              value={size}
+              onChange={(event) => setSize(event.currentTarget.value)}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-medium">
+            <span>{zh ? '前景色' : 'Foreground'}</span>
+            <input
+              type="color"
+              value={dark}
+              onChange={(event) => setDark(event.currentTarget.value)}
+              className="h-10 w-full rounded-xl border border-border p-1"
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-medium">
+            <span>{zh ? '背景色' : 'Background'}</span>
+            <input
+              type="color"
+              value={light}
+              onChange={(event) => setLight(event.currentTarget.value)}
+              className="h-10 w-full rounded-xl border border-border p-1"
+            />
+          </label>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => void generate()}>{zh ? '生成二维码' : 'Generate QR code'}</Button>
-          {svg ? <Button variant="outline" onClick={() => downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'lighttools-qr.svg')}>{zh ? '下载 SVG' : 'Download SVG'}</Button> : null}
-          {svg ? <Button variant="outline" onClick={() => void downloadPng()}>{zh ? '下载 PNG' : 'Download PNG'}</Button> : null}
+          {svg ? (
+            <Button
+              variant="outline"
+              onClick={() =>
+                downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'lighttools-qr.svg')
+              }
+            >
+              {zh ? '下载 SVG' : 'Download SVG'}
+            </Button>
+          ) : null}
+          {svg ? (
+            <Button variant="outline" onClick={() => void downloadPng()}>
+              {zh ? '下载 PNG' : 'Download PNG'}
+            </Button>
+          ) : null}
         </div>
-        {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+        {error ? (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
       </section>
       <section className="grid min-h-80 place-items-center rounded-3xl border border-border bg-background-muted p-6">
-        {previewUrl ? <img src={previewUrl} alt={zh ? '生成的二维码预览' : 'Generated QR code preview'} className="max-h-96 max-w-full rounded-xl bg-white p-2" /> : <p className="text-sm text-muted-foreground">{zh ? '生成后在这里预览' : 'Preview appears here after generation'}</p>}
+        {previewUrl ? (
+          <img
+            src={previewUrl}
+            alt={zh ? '生成的二维码预览' : 'Generated QR code preview'}
+            className="max-h-96 max-w-full rounded-xl bg-white p-2"
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {zh ? '生成后在这里预览' : 'Preview appears here after generation'}
+          </p>
+        )}
       </section>
     </div>
   )

@@ -336,6 +336,12 @@ const TOOL_COPY: Record<Locale, Record<ToolSlug, ToolCopy>> = {
       title: 'JWT 解析',
       description: '只读解析 JWT Header 与 Payload，不把解析冒充为签名验证。',
     },
+    'text-diff': {
+      title: '文本差异对比',
+      description: '按行比较两段文本，清楚标记新增、删除与未变化内容。',
+    },
+    'qr-code': { title: '二维码生成', description: '在浏览器本地生成可下载的 SVG 与 PNG 二维码。' },
+    'cron-explain': { title: 'Cron 解析', description: '校验并解释标准 5 段 Cron 表达式。' },
     regex: { title: '正则测试', description: '在浏览器中测试正则表达式、标志位与匹配结果。' },
   },
   en: {
@@ -415,6 +421,19 @@ const TOOL_COPY: Record<Locale, Record<ToolSlug, ToolCopy>> = {
       title: 'JWT Decoder',
       description:
         'Read JWT header and payload data without pretending that decoding verifies a signature.',
+    },
+    'text-diff': {
+      title: 'Text Diff',
+      description:
+        'Compare two texts line by line with clear additions, removals, and unchanged lines.',
+    },
+    'qr-code': {
+      title: 'QR Code Generator',
+      description: 'Generate downloadable SVG and PNG QR codes locally in your browser.',
+    },
+    'cron-explain': {
+      title: 'Cron Explainer',
+      description: 'Validate and explain standard five-field cron expressions.',
     },
     regex: {
       title: 'Regex Tester',

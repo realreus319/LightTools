@@ -39,8 +39,7 @@ export function diffLines(left: string, right: string): DiffOperation[] {
       leftIndex += 1
       rightIndex += 1
     } else if (
-      (matrix[leftIndex + 1]?.[rightIndex] ?? 0) >=
-      (matrix[leftIndex]?.[rightIndex + 1] ?? 0)
+      (matrix[leftIndex + 1]?.[rightIndex] ?? 0) >= (matrix[leftIndex]?.[rightIndex + 1] ?? 0)
     ) {
       operations.push({ type: 'remove', line: a[leftIndex] ?? '' })
       leftIndex += 1

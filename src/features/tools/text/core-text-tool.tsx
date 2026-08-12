@@ -24,7 +24,12 @@ export function isCoreTextToolSlug(value: string): value is CoreTextToolSlug {
 }
 
 export function CoreTextTool({ locale, slug }: { locale: Locale; slug: CoreTextToolSlug }) {
-  if (slug === 'json-format' || slug === 'url-codec' || slug === 'text-stats' || slug === 'text-clean') {
+  if (
+    slug === 'json-format' ||
+    slug === 'url-codec' ||
+    slug === 'text-stats' ||
+    slug === 'text-clean'
+  ) {
     return <BasicTextTool locale={locale} mode={slug} />
   }
   if (slug === 'base64' || slug === 'hash') {

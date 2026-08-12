@@ -40,7 +40,17 @@ function copy(locale: Locale) {
   }
 }
 
-function TextArea({ value, onChange, readOnly = false, label }: { value: string; onChange?: (value: string) => void; readOnly?: boolean; label: string }) {
+function TextArea({
+  value,
+  onChange,
+  readOnly = false,
+  label,
+}: {
+  value: string
+  onChange?: (value: string) => void
+  readOnly?: boolean
+  label: string
+}) {
   return (
     <label className="grid gap-2 text-sm font-medium">
       <span>{label}</span>
@@ -69,7 +79,8 @@ export function BasicTextTool({ locale, mode }: { locale: Locale; mode: BasicMod
   const runJson = (action: 'format' | 'minify' | 'validate') => {
     setMessage(undefined)
     try {
-      const result = action === 'format' ? formatJson(input) : action === 'minify' ? minifyJson(input) : ''
+      const result =
+        action === 'format' ? formatJson(input) : action === 'minify' ? minifyJson(input) : ''
       if (action !== 'validate') setOutput(result)
       setMessage(action === 'validate' ? labels.valid : undefined)
     } catch (error) {
@@ -121,28 +132,80 @@ export function BasicTextTool({ locale, mode }: { locale: Locale; mode: BasicMod
       {mode === 'json-format' ? (
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => runJson('format')}>{labels.format}</Button>
-          <Button variant="outline" onClick={() => runJson('minify')}>{labels.minify}</Button>
-          <Button variant="outline" onClick={() => runJson('validate')}>{labels.validate}</Button>
+          <Button variant="outline" onClick={() => runJson('minify')}>
+            {labels.minify}
+          </Button>
+          <Button variant="outline" onClick={() => runJson('validate')}>
+            {labels.validate}
+          </Button>
         </div>
       ) : mode === 'url-codec' ? (
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => runUrl('encode')}>{labels.encode}</Button>
-          <Button variant="outline" onClick={() => runUrl('decode')}>{labels.decode}</Button>
+          <Button variant="outline" onClick={() => runUrl('decode')}>
+            {labels.decode}
+          </Button>
         </div>
       ) : (
         <div className="space-y-4">
           <div className="flex flex-wrap gap-4 text-sm">
-            <label className="flex items-center gap-2"><input type="checkbox" checked={trim} onChange={(event) => setTrim(event.currentTarget.checked)} />{labels.trim}</label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={removeEmpty} onChange={(event) => setRemoveEmpty(event.currentTarget.checked)} />{labels.empty}</label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={dedupe} onChange={(event) => setDedupe(event.currentTarget.checked)} />{labels.dedupe}</label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={sort} onChange={(event) => setSort(event.currentTarget.checked)} />{labels.sort}</label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={trim}
+                onChange={(event) => setTrim(event.currentTarget.checked)}
+              />
+              {labels.trim}
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={removeEmpty}
+                onChange={(event) => setRemoveEmpty(event.currentTarget.checked)}
+              />
+              {labels.empty}
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={dedupe}
+                onChange={(event) => setDedupe(event.currentTarget.checked)}
+              />
+              {labels.dedupe}
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={sort}
+                onChange={(event) => setSort(event.currentTarget.checked)}
+              />
+              {labels.sort}
+            </label>
           </div>
-          <Button onClick={() => setOutput(cleanTextLines(input, { trim, removeEmpty, deduplicate: dedupe, sort }))}>{labels.clean}</Button>
+          <Button
+            onClick={() =>
+              setOutput(cleanTextLines(input, { trim, removeEmpty, deduplicate: dedupe, sort }))
+            }
+          >
+            {labels.clean}
+          </Button>
         </div>
       )}
 
-      {output ? <Button variant="ghost" size="sm" onClick={() => void navigator.clipboard.writeText(output)}>{labels.copy}</Button> : null}
-      {message ? <p role="status" className="text-sm text-muted-foreground">{message}</p> : null}
+      {output ? (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => void navigator.clipboard.writeText(output)}
+        >
+          {labels.copy}
+        </Button>
+      ) : null}
+      {message ? (
+        <p role="status" className="text-sm text-muted-foreground">
+          {message}
+        </p>
+      ) : null}
     </div>
   )
 }
