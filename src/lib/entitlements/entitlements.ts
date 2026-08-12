@@ -1,8 +1,5 @@
 export type EntitlementKey =
-  | 'advanced_presets'
-  | 'large_batches'
-  | 'priority_processing'
-  | 'ad_free'
+  'advanced_presets' | 'large_batches' | 'priority_processing' | 'ad_free'
 
 export type EntitlementContext = {
   userId?: string

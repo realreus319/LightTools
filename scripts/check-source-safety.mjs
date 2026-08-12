@@ -4,9 +4,15 @@ import { extname, join, relative } from 'node:path'
 const ROOTS = ['app', 'src']
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx'])
 const FORBIDDEN = [
-  { pattern: /dangerouslySetInnerHTML/, reason: 'dangerouslySetInnerHTML requires an explicit security review' },
+  {
+    pattern: /dangerouslySetInnerHTML/,
+    reason: 'dangerouslySetInnerHTML requires an explicit security review',
+  },
   { pattern: /\bsrcDoc\s*=/, reason: 'srcDoc can introduce HTML injection paths' },
-  { pattern: /\.innerHTML\s*=/, reason: 'direct innerHTML assignment can introduce HTML injection paths' },
+  {
+    pattern: /\.innerHTML\s*=/,
+    reason: 'direct innerHTML assignment can introduce HTML injection paths',
+  },
 ]
 const CONSOLE_PATTERN = /console\.(log|info|warn|error)\s*\(/
 const SAFE_CONSOLE_FILE = 'src/lib/debug/debug-logger.ts'

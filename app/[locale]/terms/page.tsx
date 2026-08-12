@@ -36,11 +36,7 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
       <a href="#main-content" className="lt-skip-link">
         {getLegalDocument(locale, 'terms').title}
       </a>
-      <SiteHeader
-        locale={locale}
-        messages={messages}
-        languageHref={`/${alternateLocale}/terms`}
-      />
+      <SiteHeader locale={locale} messages={messages} languageHref={`/${alternateLocale}/terms`} />
       <LegalPage document={getLegalDocument(locale, 'terms')} />
       <SiteFooter locale={locale} messages={messages} />
     </>

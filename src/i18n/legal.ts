@@ -18,7 +18,8 @@ const DOCUMENTS: Record<Locale, Record<LegalKind, LegalDocument>> = {
   'zh-CN': {
     privacy: {
       title: '隐私政策',
-      description: 'LightTools 采用 Local First 设计，说明我们如何处理文件、文本、浏览器存储和产品遥测。',
+      description:
+        'LightTools 采用 Local First 设计，说明我们如何处理文件、文本、浏览器存储和产品遥测。',
       updatedLabel: '更新日期',
       updated: '2026 年 8 月 12 日',
       sections: [
@@ -73,7 +74,8 @@ const DOCUMENTS: Record<Locale, Record<LegalKind, LegalDocument>> = {
     },
     terms: {
       title: '使用条款',
-      description: '使用 LightTools 前，请了解本地处理、结果责任、第三方组件和服务可用性的基本约定。',
+      description:
+        '使用 LightTools 前，请了解本地处理、结果责任、第三方组件和服务可用性的基本约定。',
       updatedLabel: '更新日期',
       updated: '2026 年 8 月 12 日',
       sections: [
@@ -85,7 +87,9 @@ const DOCUMENTS: Record<Locale, Record<LegalKind, LegalDocument>> = {
         },
         {
           title: '2. 合法使用',
-          paragraphs: ['你应确保自己有权处理所选择的文件和数据，并遵守适用法律、合同义务和第三方权利。'],
+          paragraphs: [
+            '你应确保自己有权处理所选择的文件和数据，并遵守适用法律、合同义务和第三方权利。',
+          ],
           bullets: [
             '不得利用服务实施违法、侵权、欺诈或破坏性活动。',
             '不得故意以异常自动化流量、恶意输入或攻击方式影响服务稳定性。',
@@ -127,7 +131,8 @@ const DOCUMENTS: Record<Locale, Record<LegalKind, LegalDocument>> = {
   en: {
     privacy: {
       title: 'Privacy Policy',
-      description: 'How LightTools handles files, text, browser storage, and product telemetry under a Local First design.',
+      description:
+        'How LightTools handles files, text, browser storage, and product telemetry under a Local First design.',
       updatedLabel: 'Updated',
       updated: 'August 12, 2026',
       sections: [
@@ -182,7 +187,8 @@ const DOCUMENTS: Record<Locale, Record<LegalKind, LegalDocument>> = {
     },
     terms: {
       title: 'Terms of Use',
-      description: 'Basic terms covering local processing, result responsibility, third-party components, and service availability.',
+      description:
+        'Basic terms covering local processing, result responsibility, third-party components, and service availability.',
       updatedLabel: 'Updated',
       updated: 'August 12, 2026',
       sections: [
