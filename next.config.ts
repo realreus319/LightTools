@@ -28,6 +28,16 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  webpack(config) {
+    // Webpack can report a runtime-chunk hash cycle for the independently code-split WASM loaders.
+    // This is not a source-module circular dependency. E2E separately asserts that tool WASM/PDF
+    // resources are not loaded by the homepage, so keep this exception narrow to this exact warning.
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings ?? []),
+      { message: /Circular dependency between chunks with runtime/ },
+    ]
+    return config
+  },
   async headers() {
     return [
       {
