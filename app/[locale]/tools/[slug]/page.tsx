@@ -7,8 +7,10 @@ import { ToolPageShell } from '@/components/tool-shell/tool-page-shell'
 import { ImageCompressTool } from '@/features/tools/image/image-compress/image-compress-tool'
 import { ImageCropTool } from '@/features/tools/image/image-crop/image-crop-tool'
 import { ImageTransformTool } from '@/features/tools/image/image-transform/image-transform-tool'
+import { ImageToPdfTool } from '@/features/tools/pdf/image-to-pdf/image-to-pdf-tool'
 import { PdfMergeTool } from '@/features/tools/pdf/pdf-merge/pdf-merge-tool'
 import { PdfSplitTool } from '@/features/tools/pdf/pdf-split/pdf-split-tool'
+import { PdfToImageTool } from '@/features/tools/pdf/pdf-to-image/pdf-to-image-tool'
 import { getAlternateLocale, isLocale, locales } from '@/i18n/config'
 import { getMessages, getToolCopy } from '@/i18n/messages'
 import {
@@ -52,6 +54,10 @@ export default async function ToolPage({
       <PdfMergeTool locale={locale} />
     ) : tool.slug === 'pdf-split' ? (
       <PdfSplitTool locale={locale} />
+    ) : tool.slug === 'image-to-pdf' ? (
+      <ImageToPdfTool locale={locale} />
+    ) : tool.slug === 'pdf-to-image' ? (
+      <PdfToImageTool locale={locale} />
     ) : undefined
 
   return (
