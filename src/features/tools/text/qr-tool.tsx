@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { Button } from '@appica/ui-react/button'
@@ -147,9 +148,12 @@ export function QrTool({ locale }: { locale: Locale }) {
       </section>
       <section className="grid min-h-80 place-items-center rounded-3xl border border-border bg-background-muted p-6">
         {previewUrl ? (
-          <img
+          <Image
             src={previewUrl}
             alt={zh ? '生成的二维码预览' : 'Generated QR code preview'}
+            width={384}
+            height={384}
+            unoptimized
             className="max-h-96 max-w-full rounded-xl bg-white p-2"
           />
         ) : (
