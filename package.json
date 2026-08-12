@@ -17,7 +17,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "check:safety": "node scripts/check-source-safety.mjs",
+    "check:licenses": "node scripts/check-licenses.mjs"
   },
   "dependencies": {
     "@appica/ui-react": "1.0.0",

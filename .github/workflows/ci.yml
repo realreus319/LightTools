@@ -39,5 +39,9 @@ jobs:
         run: pnpm typecheck
       - name: Test
         run: pnpm test
+      - name: Source safety
+        run: pnpm check:safety
+      - name: Production licenses
+        run: pnpm check:licenses
       - name: Build
         run: pnpm build
