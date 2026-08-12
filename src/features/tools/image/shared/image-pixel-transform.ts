@@ -85,12 +85,7 @@ function copyPixel(
 }
 
 function cropImage(image: ImageData, rect: CropRect): ImageData {
-  if (
-    rect.x === 0 &&
-    rect.y === 0 &&
-    rect.width === image.width &&
-    rect.height === image.height
-  ) {
+  if (rect.x === 0 && rect.y === 0 && rect.width === image.width && rect.height === image.height) {
     return image
   }
 

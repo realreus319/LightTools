@@ -9,12 +9,7 @@ import { ImageCropTool } from '@/features/tools/image/image-crop/image-crop-tool
 import { ImageTransformTool } from '@/features/tools/image/image-transform/image-transform-tool'
 import { getAlternateLocale, isLocale, locales } from '@/i18n/config'
 import { getMessages, getToolCopy } from '@/i18n/messages'
-import {
-  getRelatedTools,
-  getToolBySlug,
-  tools,
-  type ToolSlug,
-} from '@/lib/tool-registry/tools'
+import { getRelatedTools, getToolBySlug, tools, type ToolSlug } from '@/lib/tool-registry/tools'
 
 export function generateStaticParams() {
   return locales.flatMap((locale) => tools.map((tool) => ({ locale, slug: tool.slug })))
