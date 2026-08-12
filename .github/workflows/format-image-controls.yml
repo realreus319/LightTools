@@ -1,0 +1,39 @@
+name: Format image controls
+
+on:
+  push:
+    branches: [feat/commercial-v1]
+    paths:
+      - '.github/workflows/format-image-controls.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: feat/commercial-v1
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.11.1
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prettier --write src/features/tools/image/image-transform/copy.ts src/features/tools/image/image-transform/image-transform-tool.tsx src/features/tools/image/shared/image-codec.ts
+      - name: Commit formatting
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/features/tools/image/image-transform/copy.ts src/features/tools/image/image-transform/image-transform-tool.tsx src/features/tools/image/shared/image-codec.ts
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'chore: format image controls checkpoint'
+          git push origin HEAD:feat/commercial-v1
