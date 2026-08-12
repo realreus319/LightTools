@@ -18,6 +18,12 @@ function toHex(buffer: ArrayBuffer): string {
   return Array.from(new Uint8Array(buffer), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
+function copyUint8ArrayToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength)
+  copy.set(bytes)
+  return copy.buffer
+}
+
 export function EncodingTool({ locale, mode }: { locale: Locale; mode: EncodingMode }) {
   const zh = locale === 'zh-CN'
   const [input, setInput] = useState('')
@@ -125,7 +131,10 @@ export function EncodingTool({ locale, mode }: { locale: Locale; mode: EncodingM
             <Button
               variant="outline"
               onClick={() =>
-                downloadBlob(new Blob([decodedBytes.buffer]), 'lighttools-decoded.bin')
+                downloadBlob(
+                  new Blob([copyUint8ArrayToArrayBuffer(decodedBytes)]),
+                  'lighttools-decoded.bin',
+                )
               }
             >
               {zh ? '下载解码文件' : 'Download decoded file'}
