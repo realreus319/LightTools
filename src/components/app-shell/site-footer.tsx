@@ -20,6 +20,9 @@ export function SiteFooter({ locale, messages }: { locale: Locale; messages: Mes
           <Link href={`/${locale}/terms`} className="hover:text-foreground">
             {messages.footer.terms}
           </Link>
+          <Link href={`/${locale}/licenses`} className="hover:text-foreground">
+            {locale === 'zh-CN' ? '第三方许可' : 'Licenses'}
+          </Link>
           <a href="https://github.com/realreus319/LightTools" className="hover:text-foreground">
             {messages.footer.github}
           </a>
