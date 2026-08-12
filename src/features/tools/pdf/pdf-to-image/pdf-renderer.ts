@@ -82,9 +82,7 @@ export async function renderPdfToImages(
           })
         }
 
-        const canvas =
-          document.ownerDocument?.createElement?.('canvas') ??
-          globalThis.document.createElement('canvas')
+        const canvas = globalThis.document.createElement('canvas')
         canvas.width = width
         canvas.height = height
         const context = canvas.getContext('2d', { alpha: options.format === 'image/png' })
