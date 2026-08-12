@@ -48,10 +48,16 @@ export function PdfMergeTool({ locale }: { locale: Locale }) {
       try {
         await validateFile(entry.file, PDF_FILE_POLICY)
         const buffer = await entry.file.arrayBuffer()
-        const inspected = await getPool().run<InspectResult>('inspect-pdf', { buffer }, { transfer: [buffer] })
+        const inspected = await getPool().run<InspectResult>(
+          'inspect-pdf',
+          { buffer },
+          { transfer: [buffer] },
+        )
         setEntries((current) =>
           current.map((item) =>
-            item.id === entry.id ? { ...item, pageCount: inspected.pageCount, loading: false } : item,
+            item.id === entry.id
+              ? { ...item, pageCount: inspected.pageCount, loading: false }
+              : item,
           ),
         )
       } catch (error) {
@@ -124,7 +130,11 @@ export function PdfMergeTool({ locale }: { locale: Locale }) {
     setBusy(true)
     try {
       const buffers = await Promise.all(entries.map((entry) => entry.file.arrayBuffer()))
-      const merged = await getPool().run<MergeResult>('merge-pdfs', { buffers }, { transfer: buffers })
+      const merged = await getPool().run<MergeResult>(
+        'merge-pdfs',
+        { buffers },
+        { transfer: buffers },
+      )
       setResult(new Blob([merged.buffer], { type: 'application/pdf' }))
     } catch (error) {
       const toolError = toToolError(error)
@@ -186,7 +196,12 @@ export function PdfMergeTool({ locale }: { locale: Locale }) {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" disabled={index === 0} onClick={() => moveEntry(index, -1)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={index === 0}
+                  onClick={() => moveEntry(index, -1)}
+                >
                   {copy.moveUp}
                 </Button>
                 <Button
@@ -200,7 +215,9 @@ export function PdfMergeTool({ locale }: { locale: Locale }) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setEntries((current) => current.filter((item) => item.id !== entry.id))}
+                  onClick={() =>
+                    setEntries((current) => current.filter((item) => item.id !== entry.id))
+                  }
                 >
                   {copy.remove}
                 </Button>
@@ -211,7 +228,10 @@ export function PdfMergeTool({ locale }: { locale: Locale }) {
       ) : null}
 
       {errorMessage ? (
-        <p role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        <p
+          role="alert"
+          className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+        >
           {copy.batchError}: {errorMessage}
         </p>
       ) : null}

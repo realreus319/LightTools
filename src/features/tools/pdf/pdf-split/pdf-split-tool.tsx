@@ -56,7 +56,11 @@ export function PdfSplitTool({ locale }: { locale: Locale }) {
       try {
         await validateFile(selected, PDF_FILE_POLICY)
         const buffer = await selected.arrayBuffer()
-        const inspected = await getPool().run<InspectResult>('inspect-pdf', { buffer }, { transfer: [buffer] })
+        const inspected = await getPool().run<InspectResult>(
+          'inspect-pdf',
+          { buffer },
+          { transfer: [buffer] },
+        )
         setPageCount(inspected.pageCount)
         setRange(`1-${inspected.pageCount}`)
       } catch (error) {
@@ -180,7 +184,10 @@ export function PdfSplitTool({ locale }: { locale: Locale }) {
       ) : null}
 
       {errorMessage ? (
-        <p role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        <p
+          role="alert"
+          className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+        >
           {errorMessage}
         </p>
       ) : null}

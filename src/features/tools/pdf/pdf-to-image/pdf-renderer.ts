@@ -9,12 +9,19 @@ export type PdfRenderedPage = {
   height: number
 }
 
-function canvasToBlob(canvas: HTMLCanvasElement, format: PdfRenderFormat, quality: number): Promise<Blob> {
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  format: PdfRenderFormat,
+  quality: number,
+): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
         if (blob) resolve(blob)
-        else reject(new ToolError('ENCODE_FAILED', 'Canvas could not encode PDF page', { stage: 'encode' }))
+        else
+          reject(
+            new ToolError('ENCODE_FAILED', 'Canvas could not encode PDF page', { stage: 'encode' }),
+          )
       },
       format,
       Math.max(0.01, Math.min(1, quality / 100)),
@@ -26,9 +33,15 @@ function mapPdfJsError(error: unknown): ToolError {
   const message = error instanceof Error ? error.message : String(error)
   const name = error instanceof Error ? error.name : ''
   if (/password/i.test(message) || /PasswordException/i.test(name)) {
-    return new ToolError('PDF_ENCRYPTED', 'PDF is password protected', { stage: 'decode', cause: error })
+    return new ToolError('PDF_ENCRYPTED', 'PDF is password protected', {
+      stage: 'decode',
+      cause: error,
+    })
   }
-  return new ToolError('PDF_INVALID', 'PDF could not be rendered', { stage: 'decode', cause: error })
+  return new ToolError('PDF_INVALID', 'PDF could not be rendered', {
+    stage: 'decode',
+    cause: error,
+  })
 }
 
 export async function renderPdfToImages(
@@ -69,11 +82,16 @@ export async function renderPdfToImages(
           })
         }
 
-        const canvas = document.ownerDocument?.createElement?.('canvas') ?? globalThis.document.createElement('canvas')
+        const canvas =
+          document.ownerDocument?.createElement?.('canvas') ??
+          globalThis.document.createElement('canvas')
         canvas.width = width
         canvas.height = height
         const context = canvas.getContext('2d', { alpha: options.format === 'image/png' })
-        if (!context) throw new ToolError('ENCODE_FAILED', 'Canvas 2D context is unavailable', { stage: 'transform' })
+        if (!context)
+          throw new ToolError('ENCODE_FAILED', 'Canvas 2D context is unavailable', {
+            stage: 'transform',
+          })
 
         if (options.format !== 'image/png') {
           context.fillStyle = '#ffffff'

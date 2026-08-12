@@ -231,7 +231,12 @@ export function ImageToPdfTool({ locale }: { locale: Locale }) {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" disabled={index === 0} onClick={() => moveFile(index, -1)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={index === 0}
+                  onClick={() => moveFile(index, -1)}
+                >
                   {copy.moveUp}
                 </Button>
                 <Button
@@ -242,7 +247,13 @@ export function ImageToPdfTool({ locale }: { locale: Locale }) {
                 >
                   {copy.moveDown}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => setFiles((current) => current.filter((_, itemIndex) => itemIndex !== index))}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    setFiles((current) => current.filter((_, itemIndex) => itemIndex !== index))
+                  }
+                >
                   {copy.remove}
                 </Button>
               </div>
@@ -253,7 +264,10 @@ export function ImageToPdfTool({ locale }: { locale: Locale }) {
       ) : null}
 
       {errorMessage ? (
-        <p role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        <p
+          role="alert"
+          className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+        >
           {copy.error}: {errorMessage}
         </p>
       ) : null}

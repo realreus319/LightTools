@@ -78,7 +78,11 @@ export function PdfToImageTool({ locale }: { locale: Locale }) {
       try {
         await validateFile(selected, PDF_FILE_POLICY)
         const buffer = await selected.arrayBuffer()
-        const inspected = await getPdfPool().run<InspectResult>('inspect-pdf', { buffer }, { transfer: [buffer] })
+        const inspected = await getPdfPool().run<InspectResult>(
+          'inspect-pdf',
+          { buffer },
+          { transfer: [buffer] },
+        )
         setPageCount(inspected.pageCount)
       } catch (error) {
         const toolError = toToolError(error)
@@ -206,7 +210,10 @@ export function PdfToImageTool({ locale }: { locale: Locale }) {
       ) : null}
 
       {errorMessage ? (
-        <p role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+        <p
+          role="alert"
+          className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+        >
           {copy.error}: {errorMessage}
         </p>
       ) : null}

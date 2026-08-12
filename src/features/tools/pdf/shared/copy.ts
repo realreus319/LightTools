@@ -27,8 +27,12 @@ export function getPdfCopy(locale: Locale) {
     split: zh ? '每页拆成独立 PDF' : 'Split into one PDF per page',
     process: zh ? '开始处理' : 'Process PDF',
     processing: zh ? '正在处理…' : 'Processing…',
-    invalidRange: zh ? '页码范围无效，请按 1-3,5,8-10 这样的格式填写。' : 'Invalid page range. Use a format such as 1-3,5,8-10.',
-    dragHint: zh ? '可拖拽排序，也可使用上移/下移按钮。' : 'Drag to reorder, or use the move buttons.',
+    invalidRange: zh
+      ? '页码范围无效，请按 1-3,5,8-10 这样的格式填写。'
+      : 'Invalid page range. Use a format such as 1-3,5,8-10.',
+    dragHint: zh
+      ? '可拖拽排序，也可使用上移/下移按钮。'
+      : 'Drag to reorder, or use the move buttons.',
     batchError: zh ? '无法处理这些 PDF' : 'These PDF files could not be processed',
   }
 }
