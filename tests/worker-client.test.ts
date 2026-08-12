@@ -33,9 +33,13 @@ describe('WorkerClient integration', () => {
     const client = new WorkerClient(worker as unknown as Worker)
     const progress: number[] = []
 
-    const pending = client.run<{ ok: boolean }>('echo', { value: 1 }, {
-      onProgress: (value) => progress.push(value),
-    })
+    const pending = client.run<{ ok: boolean }>(
+      'echo',
+      { value: 1 },
+      {
+        onProgress: (value) => progress.push(value),
+      },
+    )
     const request = getRunRequest(worker)
 
     worker.respond({ type: 'progress', id: request.id, progress: 1.5 })

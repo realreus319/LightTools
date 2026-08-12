@@ -32,7 +32,9 @@ test('JSON formatter produces formatted output', async ({ page }) => {
   await expect(textareas.nth(1)).toHaveValue(/"b": \[/)
 })
 
-test('image compression runs real PNG/WebP codecs, target-size logic, and download', async ({ page }) => {
+test('image compression runs real PNG/WebP codecs, target-size logic, and download', async ({
+  page,
+}) => {
   await page.goto('/en/tools/image-compress')
   await page.getByLabel('Output format').selectOption('image/webp')
   await page.getByLabel('Target size (KB, optional)').fill('1')

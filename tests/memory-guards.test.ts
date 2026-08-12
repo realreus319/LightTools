@@ -22,11 +22,7 @@ describe('memory protection guards', () => {
   })
 
   it('rejects a PDF over the per-file memory limit before reading its signature', async () => {
-    const oversized = sizedFile(
-      PDF_FILE_POLICY.maxFileBytes + 1,
-      'huge.pdf',
-      'application/pdf',
-    )
+    const oversized = sizedFile(PDF_FILE_POLICY.maxFileBytes + 1, 'huge.pdf', 'application/pdf')
 
     await expect(validateFile(oversized, PDF_FILE_POLICY)).rejects.toMatchObject({
       code: 'FILE_TOO_LARGE',
