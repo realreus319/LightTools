@@ -31,8 +31,43 @@ export function FileQueueList({
 }: FileQueueListProps) {
   if (items.length === 0) return null
 
+  const zh = locale.toLowerCase().startsWith('zh')
+  const completed = items.filter((item) =>
+    ['success', 'error', 'cancelled'].includes(item.status),
+  ).length
+  const failed = items.filter((item) => item.status === 'error').length
+  const overallProgress =
+    items.reduce((sum, item) => {
+      if (item.status === 'success' || item.status === 'error' || item.status === 'cancelled') {
+        return sum + 1
+      }
+      if (item.status === 'processing') return sum + item.progress
+      return sum
+    }, 0) / items.length
+
   return (
     <div className="mt-6 grid gap-3">
+      <section
+        aria-live="polite"
+        className="rounded-2xl border border-border bg-background-muted/35 p-4"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <span className="font-medium">
+            {zh ? '批量进度' : 'Batch progress'} · {completed}/{items.length}
+          </span>
+          <span className="text-muted-foreground">
+            {Math.round(overallProgress * 100)}%
+            {failed > 0 ? ` · ${zh ? '失败' : 'Failed'} ${failed}` : ''}
+          </span>
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-background-muted">
+          <div
+            className="h-full rounded-full bg-[var(--lt-brand)] transition-[width] motion-reduce:transition-none"
+            style={{ width: `${Math.round(overallProgress * 100)}%` }}
+          />
+        </div>
+      </section>
+
       {items.map((item) => {
         const errorMessage = item.status === 'error' ? getErrorMessage?.(item) : undefined
         return (
