@@ -27,9 +27,18 @@ import {
   isSupportedImageMime,
   type ImageProcessPayload,
   type ImageProcessResult,
+  type SupportedImageMime,
 } from '../shared/image-types'
 
 type CropPreset = 'free' | '1:1' | '4:3' | '16:9'
+type OutputFormat = 'same' | SupportedImageMime
+
+type CropResultStats = {
+  width: number
+  height: number
+  quality: number
+  mime: SupportedImageMime
+}
 
 function getCopy(locale: Locale) {
   const zh = locale === 'zh-CN'
@@ -51,6 +60,11 @@ function getCopy(locale: Locale) {
     rotate: zh ? '旋转' : 'Rotate',
     flipX: zh ? '水平翻转' : 'Flip horizontal',
     flipY: zh ? '垂直翻转' : 'Flip vertical',
+    outputFormat: zh ? '输出格式' : 'Output format',
+    sameFormat: zh ? '保持原格式' : 'Keep original format',
+    quality: zh ? '质量' : 'Quality',
+    jpegBackground: zh ? 'JPEG 背景色' : 'JPEG background',
+    dimensions: zh ? '最终尺寸' : 'Final dimensions',
     result: zh ? '处理结果' : 'Results',
     download: zh ? '下载' : 'Download',
     downloadAll: zh ? '下载全部 ZIP' : 'Download all as ZIP',
@@ -66,6 +80,17 @@ function getCopy(locale: Locale) {
       remove: zh ? '移除' : 'Remove',
     },
   }
+}
+
+function parseHexColor(value: string): readonly [number, number, number] {
+  const match = /^#([0-9a-f]{6})$/i.exec(value)
+  if (!match?.[1]) return [255, 255, 255]
+  const hex = match[1]
+  return [
+    Number.parseInt(hex.slice(0, 2), 16),
+    Number.parseInt(hex.slice(2, 4), 16),
+    Number.parseInt(hex.slice(4, 6), 16),
+  ]
 }
 
 function createTransform(
@@ -117,7 +142,11 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
   const [rotate, setRotate] = useState('0')
   const [flipX, setFlipX] = useState(false)
   const [flipY, setFlipY] = useState(false)
+  const [outputFormat, setOutputFormat] = useState<OutputFormat>('same')
+  const [quality, setQuality] = useState(92)
+  const [jpegBackground, setJpegBackground] = useState('#ffffff')
   const [batchError, setBatchError] = useState<string>()
+  const [stats, setStats] = useState<Record<string, CropResultStats>>({})
   const poolRef = useRef<WorkerClientPool | undefined>(undefined)
   const controllersRef = useRef(new Map<string, AbortController>())
 
@@ -138,12 +167,14 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
           throw new TypeError('Unsupported validated image MIME')
         }
 
+        const selectedOutputMime =
+          outputFormat === 'same' ? validation.mimeType : outputFormat
         const buffer = await item.file.arrayBuffer()
         const payload: ImageProcessPayload = {
           buffer,
           inputMime: validation.mimeType,
-          outputMime: validation.mimeType,
-          quality: 92,
+          outputMime: selectedOutputMime,
+          quality,
           transform: createTransform(preset, {
             x,
             y,
@@ -153,6 +184,9 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
             flipX,
             flipY,
           }),
+          ...(selectedOutputMime === 'image/jpeg'
+            ? { jpegBackground: parseHexColor(jpegBackground) }
+            : {}),
         }
 
         const result = await getPool().run<ImageProcessResult>('process-image', payload, {
@@ -169,6 +203,15 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
             fileName: createImageOutputName(item.file.name, result.mime),
           },
         })
+        setStats((current) => ({
+          ...current,
+          [item.id]: {
+            width: result.width,
+            height: result.height,
+            quality: result.quality,
+            mime: result.mime,
+          },
+        }))
       } catch (error) {
         const toolError = toToolError(error)
         dispatch(
@@ -180,7 +223,21 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
         controllersRef.current.delete(item.id)
       }
     },
-    [dispatch, flipX, flipY, getPool, height, preset, rotate, width, x, y],
+    [
+      dispatch,
+      flipX,
+      flipY,
+      getPool,
+      height,
+      jpegBackground,
+      outputFormat,
+      preset,
+      quality,
+      rotate,
+      width,
+      x,
+      y,
+    ],
   )
 
   useEffect(() => {
@@ -226,11 +283,17 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
   const remove = (id: string) => {
     controllersRef.current.get(id)?.abort()
     dispatch({ type: 'remove', id })
+    setStats((current) => {
+      const next = { ...current }
+      delete next[id]
+      return next
+    })
   }
 
   const clearAll = () => {
     for (const controller of controllersRef.current.values()) controller.abort()
     dispatch({ type: 'clear' })
+    setStats({})
     setBatchError(undefined)
   }
 
@@ -277,6 +340,46 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
             <option value="270">270°</option>
           </select>
         </label>
+        <label className="grid gap-2 text-sm font-medium">
+          <span>{copy.outputFormat}</span>
+          <select
+            value={outputFormat}
+            onChange={(event) => setOutputFormat(event.currentTarget.value as OutputFormat)}
+            className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
+          >
+            <option value="same">{copy.sameFormat}</option>
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/png">PNG</option>
+            <option value="image/webp">WebP</option>
+            <option value="image/avif">AVIF</option>
+          </select>
+        </label>
+        <label className="grid gap-2 text-sm font-medium">
+          <span>
+            {copy.quality}: {quality}
+          </span>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value={quality}
+            onChange={(event) => setQuality(event.currentTarget.valueAsNumber)}
+            className="accent-[var(--lt-brand)]"
+          />
+        </label>
+
+        {outputFormat === 'image/jpeg' ? (
+          <label className="grid gap-2 text-sm font-medium">
+            <span>{copy.jpegBackground}</span>
+            <input
+              type="color"
+              value={jpegBackground}
+              onChange={(event) => setJpegBackground(event.currentTarget.value)}
+              className="h-10 w-full cursor-pointer rounded-xl border border-border bg-background p-1"
+            />
+          </label>
+        ) : null}
+
         <label className="flex items-center gap-2 text-sm font-medium">
           <input
             type="checkbox"
@@ -383,6 +486,7 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
             {successful.map((item) => {
               const result = item.result
               if (!result) return null
+              const itemStats = stats[item.id]
               return (
                 <article
                   key={item.id}
@@ -395,6 +499,9 @@ export function ImageCropTool({ locale }: { locale: Locale }) {
                     <p className="mt-1 text-sm text-muted-foreground">
                       {formatFileSize(item.file.size, locale)} →{' '}
                       {formatFileSize(result.blob.size, locale)}
+                      {itemStats
+                        ? ` · ${copy.dimensions}: ${itemStats.width}×${itemStats.height}`
+                        : ''}
                     </p>
                   </div>
                   <Button onClick={() => downloadBlob(result.blob, result.fileName)}>
