@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@appica/ui-react/button'
 import { Input } from '@appica/ui-react/input'
-import { CopyButton } from '@/components/common/copy-button'
+import { ResultCopyButton } from '@/components/common/result-copy-button'
 import type { Locale } from '@/i18n/config'
 import { decodeJwt, generateUuids, parseTimestamp } from './shared/text-utils'
 
@@ -106,7 +106,7 @@ export function DeveloperDataTool({ locale, mode }: { locale: Locale; mode: Deve
           />
         </label>
       ) : null}
-      {output ? <CopyButton text={output} locale={locale} /> : null}
+      {output ? <ResultCopyButton locale={locale} value={output} /> : null}
       {error ? (
         <p role="alert" className="text-sm text-destructive">
           {error}

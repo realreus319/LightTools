@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { Button } from '@appica/ui-react/button'
-import { CopyButton } from '@/components/common/copy-button'
+import { ResultCopyButton } from '@/components/common/result-copy-button'
 import type { Locale } from '@/i18n/config'
 import {
   cleanTextLines,
@@ -192,7 +192,7 @@ export function BasicTextTool({ locale, mode }: { locale: Locale; mode: BasicMod
         </div>
       )}
 
-      {output ? <CopyButton text={output} locale={locale} /> : null}
+      {output ? <ResultCopyButton locale={locale} value={output} /> : null}
       {message ? (
         <p role="status" className="text-sm text-muted-foreground">
           {message}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@appica/ui-react/button'
-import { CopyButton } from '@/components/common/copy-button'
+import { ResultCopyButton } from '@/components/common/result-copy-button'
 import type { Locale } from '@/i18n/config'
 import { downloadBlob } from '@/lib/files/download-blob'
 import {
@@ -163,7 +163,7 @@ export function EncodingTool({ locale, mode }: { locale: Locale; mode: EncodingM
         </div>
       )}
 
-      {output ? <CopyButton text={output} locale={locale} /> : null}
+      {output ? <ResultCopyButton locale={locale} value={output} /> : null}
       {error ? (
         <p role="alert" className="text-sm text-destructive">
           {error}

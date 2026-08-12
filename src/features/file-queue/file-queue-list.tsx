@@ -21,6 +21,12 @@ type FileQueueListProps = {
   onRemove(id: string): void
 }
 
+function getItemProgress(item: FileQueueItem): number {
+  if (item.status === 'queued') return 0
+  if (item.status === 'processing') return item.progress
+  return 1
+}
+
 export function FileQueueList({
   items,
   locale,
@@ -31,42 +37,33 @@ export function FileQueueList({
 }: FileQueueListProps) {
   if (items.length === 0) return null
 
-  const zh = locale.toLowerCase().startsWith('zh')
-  const completed = items.filter((item) =>
-    ['success', 'error', 'cancelled'].includes(item.status),
-  ).length
-  const failed = items.filter((item) => item.status === 'error').length
-  const overallProgress =
-    items.reduce((sum, item) => {
-      if (item.status === 'success' || item.status === 'error' || item.status === 'cancelled') {
-        return sum + 1
-      }
-      if (item.status === 'processing') return sum + item.progress
-      return sum
-    }, 0) / items.length
+  const overallProgress = items.reduce((sum, item) => sum + getItemProgress(item), 0) / items.length
+  const overallPercent = Math.round(overallProgress * 100)
+  const hasActiveItems = items.some(
+    (item) => item.status === 'queued' || item.status === 'processing',
+  )
 
   return (
     <div className="mt-6 grid gap-3">
-      <section
-        aria-live="polite"
-        className="rounded-2xl border border-border bg-background-muted/35 p-4"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-          <span className="font-medium">
-            {zh ? '批量进度' : 'Batch progress'} · {completed}/{items.length}
-          </span>
-          <span className="text-muted-foreground">
-            {Math.round(overallProgress * 100)}%
-            {failed > 0 ? ` · ${zh ? '失败' : 'Failed'} ${failed}` : ''}
-          </span>
-        </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-background-muted">
+      {hasActiveItems ? (
+        <div className="flex items-center gap-3" aria-live="polite">
           <div
-            className="h-full rounded-full bg-[var(--lt-brand)] transition-[width] motion-reduce:transition-none"
-            style={{ width: `${Math.round(overallProgress * 100)}%` }}
-          />
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={overallPercent}
+            className="h-2 flex-1 overflow-hidden rounded-full bg-background-muted"
+          >
+            <div
+              className="h-full rounded-full bg-[var(--lt-brand)] transition-[width] motion-reduce:transition-none"
+              style={{ width: `${overallPercent}%` }}
+            />
+          </div>
+          <span className="w-12 text-end text-xs tabular-nums text-muted-foreground">
+            {overallPercent}%
+          </span>
         </div>
-      </section>
+      ) : null}
 
       {items.map((item) => {
         const errorMessage = item.status === 'error' ? getErrorMessage?.(item) : undefined
@@ -99,8 +96,11 @@ export function FileQueueList({
             </div>
             {item.status === 'processing' ? (
               <div
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(item.progress * 100)}
                 className="mt-3 h-1.5 overflow-hidden rounded-full bg-background-muted"
-                aria-label={`${labels.processing} ${Math.round(item.progress * 100)}%`}
               >
                 <div
                   className="h-full rounded-full bg-[var(--lt-brand)] transition-[width] motion-reduce:transition-none"
