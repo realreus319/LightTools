@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Button } from '@appica/ui-react/button'
 import { Input } from '@appica/ui-react/input'
 import { FileDropzone } from '@/components/file-dropzone/file-dropzone'
@@ -56,6 +56,8 @@ type StoredCompressionPreset = {
 }
 
 const PRESET_STORAGE_KEY = 'lighttools:image-compress-presets:v1'
+const PRESET_CHANGE_EVENT = 'lighttools:image-compress-presets-change'
+const EMPTY_PRESET_SNAPSHOT = '[]'
 const MAX_CUSTOM_PRESETS = 12
 
 const BUILT_IN_PRESETS: readonly StoredCompressionPreset[] = [
@@ -80,9 +82,29 @@ function isOutputFormat(value: unknown): value is OutputFormat {
   return value === 'same' || (typeof value === 'string' && isSupportedImageMime(value))
 }
 
-function loadCustomPresets(): StoredCompressionPreset[] {
+function getPresetSnapshot(): string {
+  return localStorage.getItem(PRESET_STORAGE_KEY) ?? EMPTY_PRESET_SNAPSHOT
+}
+
+function getServerPresetSnapshot(): string {
+  return EMPTY_PRESET_SNAPSHOT
+}
+
+function subscribeToPresets(listener: () => void): () => void {
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === PRESET_STORAGE_KEY) listener()
+  }
+  window.addEventListener('storage', handleStorage)
+  window.addEventListener(PRESET_CHANGE_EVENT, listener)
+  return () => {
+    window.removeEventListener('storage', handleStorage)
+    window.removeEventListener(PRESET_CHANGE_EVENT, listener)
+  }
+}
+
+function parseCustomPresets(snapshot: string): StoredCompressionPreset[] {
   try {
-    const parsed: unknown = JSON.parse(localStorage.getItem(PRESET_STORAGE_KEY) ?? '[]')
+    const parsed: unknown = JSON.parse(snapshot)
     if (!Array.isArray(parsed)) return []
     return parsed.flatMap((value) => {
       if (!value || typeof value !== 'object') return []
@@ -135,14 +157,15 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
   const [targetSizeKb, setTargetSizeKb] = useState('')
   const [batchError, setBatchError] = useState<string>()
   const [stats, setStats] = useState<Record<string, ImageStats>>({})
-  const [customPresets, setCustomPresets] = useState<StoredCompressionPreset[]>([])
+  const presetSnapshot = useSyncExternalStore(
+    subscribeToPresets,
+    getPresetSnapshot,
+    getServerPresetSnapshot,
+  )
+  const customPresets = useMemo(() => parseCustomPresets(presetSnapshot), [presetSnapshot])
   const [presetName, setPresetName] = useState('')
   const poolRef = useRef<WorkerClientPool | undefined>(undefined)
   const controllersRef = useRef(new Map<string, AbortController>())
-
-  useEffect(() => {
-    setCustomPresets(loadCustomPresets())
-  }, [])
 
   const getPool = useCallback(() => {
     poolRef.current ??= createPool()
@@ -157,8 +180,8 @@ export function ImageCompressTool({ locale }: { locale: Locale }) {
   }
 
   const persistPresets = (presets: StoredCompressionPreset[]) => {
-    setCustomPresets(presets)
     localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(presets))
+    window.dispatchEvent(new Event(PRESET_CHANGE_EVENT))
   }
 
   const saveCurrentPreset = () => {
